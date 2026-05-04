@@ -24,6 +24,12 @@ const labels = ["守門","照顧","釐清","自發","調適"];
 
 let state = [0,0,0,0,0];
 
+function getText(i, val){
+  if(val <= -2) return "偏低（不足）";
+  if(val >= 2) return "偏高（過度）";
+  return "適中";
+}
+
 function render() {
   const app = document.getElementById("app");
 
@@ -35,6 +41,7 @@ function render() {
         <h3>${label}：${state[i]}</h3>
         <input type="range" min="-3" max="3" value="${state[i]}"
           oninput="update(${i}, this.value)">
+        <p>狀態：${getText(i, state[i])}</p>
       </div>
     `;
   });
