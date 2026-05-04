@@ -4,62 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FivePower</title>
-
-<style>
-body { font-family: sans-serif; padding:20px; }
-.card { margin-bottom:15px; padding:10px; border:1px solid #ddd; }
-</style>
 </head>
 
 <body>
 
-<h1>五力測試版</h1>
+<h1>五力測試版 v2</h1>
 
-<div id="app">載入中...</div>
-
-<script>
-try {
-
-const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
-
-let state = [0,0,0,0,0];
-
-function getText(i, val){
-  if(val <= -2) return "偏低（不足）";
-  if(val >= 2) return "偏高（過度）";
-  return "適中";
-}
-
-function render() {
-  const app = document.getElementById("app");
-
-  let html = "";
-
-  labels.forEach((label,i)=>{
-    html += `
-      <div class="card">
-        <h3>${label}：${state[i]}</h3>
-        <input type="range" min="-3" max="3" value="${state[i]}"
-          oninput="update(${i}, this.value)">
-        <p>狀態：${getText(i, state[i])}</p>
-      </div>
-    `;
-  });
-
-  app.innerHTML = html;
-}
-
-function update(i,val){
-  state[i] = Number(val);
-  render();
-}
-
-render();
-
-} catch(e) {
-  document.body.innerHTML = "<h2>⚠ 系統錯誤</h2><pre>" + e + "</pre>";
-}
-</script>
+<p>如果你看到這行，代表更新成功</p>
 
 </body>
 </html>
