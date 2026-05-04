@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>五力互動評估系統</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FivePower</title>
 
 <style>
 body {
@@ -14,7 +13,9 @@ body {
   padding:20px;
 }
 
-h1 { margin-bottom:10px; }
+h1 {
+  margin-bottom:10px;
+}
 
 .container {
   display:grid;
@@ -51,6 +52,12 @@ select, button {
   padding:8px;
   margin-right:10px;
 }
+
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 
@@ -69,17 +76,10 @@ select, button {
   <button onclick="resetAll()">重置</button>
 </div>
 
-<div class="container">
-
-  <div id="controls"></div>
-
-  <div class="card">
-    <canvas id="radar"></canvas>
-  </div>
-
-</div>
+<div class="container" id="controls"></div>
 
 <script>
+
 const labels = ["守門","照顧","釐清","自發","調適"];
 
 let state = {
@@ -89,8 +89,8 @@ let state = {
 };
 
 const desc = {
-  0:"穩定可承載",
   "-3":"撐不起",
+  "0":"穩定可承載",
   "3":"過度"
 };
 
@@ -98,7 +98,7 @@ const questions = [
   ["我要不要設界線？","我界線OK嗎？","我太封閉嗎？"],
   ["我在給還是耗？","我有平衡嗎？","我過度付出？"],
   ["我看到事實嗎？","我理解清楚嗎？","我過度分析？"],
-  ["我有表達自己嗎？","我自然嗎？","我失控了？"],
+  ["我有表達自己嗎？","我自在嗎？","我失控了？"],
   ["我有彈性嗎？","我適應得宜？","我變太多？"]
 ];
 
@@ -138,7 +138,6 @@ function update(i,val){
   const ctx = document.getElementById("context").value;
   state[ctx][i] = Number(val);
   createUI();
-  updateChart();
 }
 
 function getState(){
@@ -149,21 +148,14 @@ function resetAll(){
   const ctx = document.getElementById("context").value;
   state[ctx] = [0,0,0,0,0];
   createUI();
-  updateChart();
 }
 
 function loadContext(){
   createUI();
-  updateChart();
-}
-
-
-function updateChart(){
-  chart.data.datasets[0].data = getState();
-  chart.update();
 }
 
 createUI();
+
 </script>
 
 </body>
