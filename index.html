@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FivePower v4</title>
+<title>FivePower v4.1</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -25,7 +25,7 @@ body { font-family: sans-serif; padding:20px; }
 
 .question { color:#555; }
 
-/* ⭐ 方案A柔和配色 */
+/* ⭐ 柔和配色 */
 .gate   { background:#fdecea; }
 .care   { background:#eaf2fb; }
 .clear  { background:#f3ecfb; }
@@ -60,7 +60,7 @@ button {
 
 <body>
 
-<h1>五力互動系統 </h1>
+<h1>五力互動系統 v4.1</h1>
 
 <label>情境：</label>
 <select id="context" onchange="render()">
@@ -191,7 +191,7 @@ function resetAll(){
   render();
 }
 
-/* ⭐ v4 雷達圖（正負分界版） */
+/* ⭐ 清晰版雷達圖 */
 function updateChart(){
   if(typeof Chart==="undefined") return;
 
@@ -200,34 +200,21 @@ function updateChart(){
 
   if(chart) chart.destroy();
 
-  const positive = data.map(v => v > 0 ? v : 0);
-  const negative = data.map(v => v < 0 ? v : 0);
-
   chart = new Chart(document.getElementById("radar"), {
     type:'radar',
     data:{
       labels:labels,
-      datasets:[
-        {
-          data: positive,
-          fill:true,
-          backgroundColor:"rgba(46,204,113,0.12)",
-          borderColor:"rgba(46,204,113,0.5)",
-          borderWidth:2,
-          pointBackgroundColor:colors,
-          pointBorderColor:"#fff",
-          pointBorderWidth:2,
-          pointRadius:5
-        },
-        {
-          data: negative,
-          fill:true,
-          backgroundColor:"rgba(231,76,60,0.12)",
-          borderColor:"rgba(231,76,60,0.5)",
-          borderWidth:2,
-          pointRadius:0
-        }
-      ]
+      datasets:[{
+        data:data,
+        fill:true,
+        backgroundColor:"rgba(100,100,100,0.06)",
+        borderColor:"rgba(80,80,80,0.4)",
+        borderWidth:2,
+        pointBackgroundColor:colors,
+        pointBorderColor:"#fff",
+        pointBorderWidth:2,
+        pointRadius:5
+      }]
     },
     options:{
       plugins:{
