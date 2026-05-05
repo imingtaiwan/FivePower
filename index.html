@@ -1,10 +1,65 @@
 <!DOCTYPE html>
-<html>
-<body style="background:yellow;">
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FivePower</title>
 
-<h1>🚨 FIVEPOWER V3 🚨</h1>
+<style>
+body { font-family: sans-serif; padding:20px; }
+.card { margin-bottom:15px; padding:10px; border:1px solid #ddd; border-radius:8px;}
+</style>
+</head>
 
-<p>如果你看到這個，代表這次真的成功了</p>
+<body>
+
+<h1>五力互動系統</h1>
+
+<div id="app">載入中...</div>
+
+<script>
+try {
+
+const labels = ["守門","照顧","釐清","自發","調適"];
+
+let state = [0,0,0,0,0];
+
+function getText(val){
+  if(val <= -2) return "偏低（不足）";
+  if(val >= 2) return "偏高（過度）";
+  return "適中";
+}
+
+function render() {
+  const app = document.getElementById("app");
+
+  let html = "";
+
+  labels.forEach((label,i)=>{
+    html += `
+      <div class="card">
+        <h3>${label}：${state[i]}</h3>
+        <input type="range" min="-3" max="3" value="${state[i]}"
+          oninput="update(${i}, this.value)">
+        <p>狀態：${getText(state[i])}</p>
+      </div>
+    `;
+  });
+
+  app.innerHTML = html;
+}
+
+function update(i,val){
+  state[i] = Number(val);
+  render();
+}
+
+render();
+
+} catch(e) {
+  document.body.innerHTML = "<h2>⚠ 系統錯誤</h2><pre>" + e + "</pre>";
+}
+</script>
 
 </body>
 </html>
