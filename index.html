@@ -3,27 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FivePower v7.1</title>
+<title>FivePower v8.2</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
 <style>
-body { font-family: sans-serif; padding:20px; }
+body { font-family: sans-serif; padding:16px; }
 
 .container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
 }
 
 .card {
-  margin-bottom:15px;
-  padding:12px;
+  margin-bottom:10px;
+  padding:8px;
   border-radius:10px;
   border:1px solid #ddd;
 }
 
-.question { color:#555; }
+.question { color:#555; font-size:13px; }
 
 .gate   { background:#fdecea; }
 .care   { background:#eaf2fb; }
@@ -32,23 +32,22 @@ body { font-family: sans-serif; padding:20px; }
 .adapt  { background:#eafaf1; }
 
 button {
-  padding:6px 10px;
-  margin-right:6px;
+  padding:4px 8px;
   cursor:pointer;
   border:none;
   border-radius:6px;
+  font-size:12px;
 }
 
-.active {
-  background:#333;
-  color:#fff;
-}
-
-.action {
+.control-row {
   display:flex;
-  justify-content:center;
-  gap:12px;
-  margin-top:8px;
+  align-items:center;
+  gap:6px;
+  margin-top:6px;
+}
+
+input[type="range"]{
+  flex:1;
 }
 
 #chartBox { align-self:start; }
@@ -61,24 +60,9 @@ button {
 
 <body>
 
-<h1>五力互動系統 v7.1</h1>
+<h2>五力互動系統 v8.2（向量模式）</h2>
 
-<label>情境：</label>
-<select id="context" onchange="render()">
-  <option value="work">工作</option>
-  <option value="relationship">關係</option>
-  <option value="family">家庭</option>
-</select>
-
-<br><br>
-
-<button id="dotBtn" onclick="setMode('dot')" class="active">點模式</button>
-<button id="lineBtn" onclick="setMode('line')">微線模式</button>
-
-<br><br>
-
-<button onclick="resetCurrent()">重置此情境</button>
-<button onclick="resetAll()">全部重置</button>
+<button onclick="resetAll()">重置</button>
 
 <div class="container">
   <div id="app"></div>
@@ -93,15 +77,9 @@ try {
 const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
 const colors = ["#d98880","#7fb3d5","#bb8fce","#f5b041","#82e0aa"];
 
-let mode = "dot";
-
 function empty(){ return [0,0,0,0,0]; }
 
-let state = {
-  work: empty(),
-  relationship: empty(),
-  family: empty()
-};
+let state = empty();
 
 const questions = [
   ["我是不是太沒有界線？","我現在的界線適當嗎？","我是不是太封閉？"],
@@ -125,34 +103,58 @@ function getQuestion(i,v){
 
 let chart=null;
 
-function setMode(m){
-  mode = m;
-  document.getElementById("dotBtn").classList.toggle("active", m==="dot");
-  document.getElementById("lineBtn").classList.toggle("active", m==="line");
-  updateChart();
-}
+/* ⭐ 向量線 plugin */
+const vectorPlugin = {
+  id: 'vectorLines',
+  afterDatasetsDraw(chart){
+    const {ctx, scales:{r}} = chart;
+    const cx = r.xCenter;
+    const cy = r.yCenter;
+
+    chart.data.datasets[0].data.forEach((value, i) => {
+      const pt = r.getPointPositionForValue(i, value);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(pt.x, pt.y);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = colors[i];
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
+};
 
 function render(){
-  const ctx = document.getElementById("context").value;
   const app = document.getElementById("app");
-
   const classMap = ["gate","care","clear","actionc","adapt"];
 
   app.innerHTML = labels.map((label,i)=>{
-    const val = state[ctx][i];
+    const val = state[i];
 
     return `
     <div class="card ${classMap[i]}">
-      <h3>${label}：${val}</h3>
-      <input type="range" min="-3" max="3" value="${val}"
-        oninput="update(${i}, this.value)">
-      <div class="action">
-        <button onclick="adjust(${i}, -1)">⬅ 收斂</button>
-        <button onclick="setMid(${i})">● 穩定</button>
-        <button onclick="adjust(${i}, 1)">補強 ➡</button>
+
+      <div style="display:flex; justify-content:space-between;">
+        <strong>${label}</strong>
+        <span style="font-size:18px; font-weight:bold;">${val}</span>
       </div>
-      <p>狀態：${getText(val)}</p>
-      <p class="question">提問：${getQuestion(i,val)}</p>
+
+      <div class="control-row">
+        <button onclick="adjust(${i}, -1)">⬅</button>
+
+        <input type="range" min="-3" max="3" value="${val}"
+          oninput="update(${i}, this.value)">
+
+        <button onclick="setMid(${i})">●</button>
+        <button onclick="adjust(${i}, 1)">➡</button>
+      </div>
+
+      <div class="question">
+        ${getText(val)}｜${getQuestion(i,val)}
+      </div>
+
     </div>`;
   }).join("");
 
@@ -160,43 +162,29 @@ function render(){
 }
 
 function update(i,val){
-  const ctx = document.getElementById("context").value;
-  state[ctx][i] = Number(val);
+  state[i] = Number(val);
   render();
 }
 
 function adjust(i,delta){
-  const ctx = document.getElementById("context").value;
-  let v = state[ctx][i] + delta;
+  let v = state[i] + delta;
   v = Math.max(-3, Math.min(3, v));
-  state[ctx][i] = v;
+  state[i] = v;
   render();
 }
 
 function setMid(i){
-  const ctx = document.getElementById("context").value;
-  state[ctx][i] = 0;
-  render();
-}
-
-function resetCurrent(){
-  const ctx = document.getElementById("context").value;
-  state[ctx] = empty();
+  state[i] = 0;
   render();
 }
 
 function resetAll(){
-  state.work = empty();
-  state.relationship = empty();
-  state.family = empty();
+  state = empty();
   render();
 }
 
 function updateChart(){
   if(typeof Chart==="undefined") return;
-
-  const data = state[document.getElementById("context").value];
-  const baseline = [0,0,0,0,0];
 
   if(chart) chart.destroy();
 
@@ -204,27 +192,16 @@ function updateChart(){
     type:'radar',
     data:{
       labels:labels,
-      datasets:[
-        {
-          data:baseline,
-          fill:true,
-          backgroundColor:"rgba(150,150,150,0.08)",
-          borderColor:"rgba(150,150,150,0.2)",
-          borderWidth:1,
-          pointRadius:0
-        },
-        {
-          data:data,
-          showLine: mode==="line",
-          fill:false,
-          borderColor:"rgba(80,80,80,0.3)",
-          borderWidth:1.5,
-          pointBackgroundColor:colors,
-          pointBorderColor:"#fff",
-          pointBorderWidth:2,
-          pointRadius:6
-        }
-      ]
+      datasets:[{
+        data:state,
+        showLine:false,
+        fill:false,
+        borderWidth:0,
+        pointBackgroundColor:colors,
+        pointBorderColor:"#fff",
+        pointBorderWidth:2,
+        pointRadius:6
+      }]
     },
     options:{
       plugins:{
@@ -252,7 +229,8 @@ function updateChart(){
           angleLines:{ color:"rgba(0,0,0,0.08)" }
         }
       }
-    }
+    },
+    plugins:[vectorPlugin]
   });
 }
 
