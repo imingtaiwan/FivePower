@@ -8,6 +8,7 @@
 <style>
 body { font-family: sans-serif; padding:20px; }
 .card { margin-bottom:15px; padding:10px; border:1px solid #ddd; border-radius:8px;}
+.question { color:#555; margin-top:5px; }
 </style>
 </head>
 
@@ -24,10 +25,25 @@ const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
 
 let state = [0,0,0,0,0];
 
+// ⭐ 每一力的提問（三段）
+const questions = [
+  ["我是不是太沒有界線？","我現在的界線適當嗎？","我是不是太封閉？"],
+  ["我是不是忽略自己？","我有在平衡照顧嗎？","我是不是過度付出？"],
+  ["我看到的是事實還是猜測？","我理解夠清楚嗎？","我是不是想太多？"],
+  ["我有表達自己嗎？","我有自然展現嗎？","我是不是太衝動或失控？"],
+  ["我有保持彈性嗎？","我調整得合適嗎？","我是不是變來變去或過度適應？"]
+];
+
 function getText(val){
   if(val <= -2) return "偏低（不足）";
   if(val >= 2) return "偏高（過度）";
   return "適中";
+}
+
+function getQuestion(i, val){
+  if(val <= -2) return questions[i][0];
+  if(val >= 2) return questions[i][2];
+  return questions[i][1];
 }
 
 function render() {
@@ -42,6 +58,7 @@ function render() {
         <input type="range" min="-3" max="3" value="${state[i]}"
           oninput="update(${i}, this.value)">
         <p>狀態：${getText(state[i])}</p>
+        <p class="question">提問：${getQuestion(i, state[i])}</p>
       </div>
     `;
   });
