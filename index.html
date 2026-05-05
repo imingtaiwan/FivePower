@@ -1,53 +1,185 @@
-<!-- ⭐ 只展示關鍵新增函式，其餘維持 v9 -->
-<script>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
 
-/* ⭐ 新增：組合解讀 */
-function getCombinationInsight(){
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 
-  const s = state;
-  let results = [];
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  if(s[0]>=2 && s[1]<=-2){
-    results.push("守門高 × 照顧低：傾向防衛，關係距離拉開");
-  }
+<title>FivePower v10</title>
 
-  if(s[0]<=-2 && s[1]>=2){
-    results.push("守門低 × 照顧高：容易過度付出");
-  }
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
-  if(s[2]<=-2 && s[3]>=2){
-    results.push("釐清低 × 自發高：行動偏衝動");
-  }
+<style>
+body { font-family: sans-serif; padding:16px; }
 
-  if(s[2]>=2 && s[3]<=-2){
-    results.push("釐清高 × 自發低：過度思考而停滯");
-  }
-
-  if(s[4]>=2 && s[0]<=-2){
-    results.push("調適高 × 守門低：容易過度迎合");
-  }
-
-  return results;
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
+.rightPanel {
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
 
-/* ⭐ 修改 showInsight */
+.chartBox {
+  height:320px;
+}
+
+.card {
+  margin-bottom:10px;
+  padding:8px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+
+.gate   { background:#fdecea; }
+.care   { background:#eaf2fb; }
+.clear  { background:#f3ecfb; }
+.actionc{ background:#fef5e7; }
+.adapt  { background:#eafaf1; }
+
+.header {
+  display:flex;
+  justify-content:space-between;
+}
+
+.value {
+  font-size:18px;
+  font-weight:bold;
+}
+
+.control-row {
+  display:flex;
+  gap:6px;
+  margin-top:6px;
+}
+
+input { flex:1; }
+
+button {
+  padding:4px 8px;
+  border:none;
+  border-radius:6px;
+}
+
+.panel {
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:12px;
+  background:#fafafa;
+}
+
+.title {
+  font-weight:bold;
+  margin-bottom:6px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>五力互動系統 v10（組合解讀）</h2>
+
+<button onclick="resetAll()">重置</button>
+
+<div class="container">
+
+  <div id="app"></div>
+
+  <div class="rightPanel">
+
+    <div class="chartBox">
+      <canvas id="radar"></canvas>
+    </div>
+
+    <div class="panel" id="insight">
+      請操作或點擊任一力
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
+const colors = ["#d98880","#7fb3d5","#bb8fce","#f5b041","#82e0aa"];
+const classMap = ["gate","care","clear","actionc","adapt"];
+
+let state = [0,0,0,0,0];
+
+const questions = [
+  ["我是不是太沒有界線？","我現在的界線適當嗎？","我是不是太封閉？"],
+  ["我是不是忽略自己或他人？","我有在平衡照顧嗎？","我是不是過度付出？"],
+  ["我看到的是事實還是猜測？","我理解夠清楚嗎？","我是不是想太多？"],
+  ["我有表達自己嗎？","我有自在展現嗎？","我是不是太衝動？"],
+  ["我有保持彈性嗎？","我調整得合適嗎？","我是不是過度適應？"]
+];
+
+function getText(v){
+  if(v<=-2) return "偏低";
+  if(v>=2) return "偏高";
+  return "適中";
+}
+
+function getQuestion(i,v){
+  if(v<=-2) return questions[i][0];
+  if(v>=2) return questions[i][2];
+  return questions[i][1];
+}
+
+function getAdvice(v){
+  if(v<=-2) return "👉 建議：補強此力";
+  if(v>=2) return "👉 建議：適度收斂";
+  return "👉 建議：維持";
+}
+
+/* ⭐ 組合解讀 */
+function getCombinationInsight(){
+
+  let r=[];
+
+  if(state[0]>=2 && state[1]<=-2){
+    r.push("守門高 × 照顧低：防衛強，關係距離拉開");
+  }
+
+  if(state[0]<=-2 && state[1]>=2){
+    r.push("守門低 × 照顧高：容易過度付出");
+  }
+
+  if(state[2]<=-2 && state[3]>=2){
+    r.push("釐清低 × 自發高：行動偏衝動");
+  }
+
+  if(state[2]>=2 && state[3]<=-2){
+    r.push("釐清高 × 自發低：過度思考");
+  }
+
+  if(state[4]>=2 && state[0]<=-2){
+    r.push("調適高 × 守門低：容易過度迎合");
+  }
+
+  return r;
+}
+
 function showInsight(i){
 
   const v = state[i];
-
   const combo = getCombinationInsight();
 
   document.getElementById("insight").innerHTML = `
     <div class="title">${labels[i]}：${v}（${getText(v)}）</div>
     <div>${getQuestion(i,v)}</div>
-
     <br>
-
     <div>${getAdvice(v)}</div>
 
     ${
-      combo.length > 0
+      combo.length
       ? `<hr><div class="title">組合解讀</div>
          ${combo.map(c=>`<div>• ${c}</div>`).join("")}`
       : ""
@@ -55,4 +187,107 @@ function showInsight(i){
   `;
 }
 
+let chart;
+
+const vectorPlugin = {
+  id:'vectorLines',
+  afterDatasetsDraw(chart){
+    const {ctx, scales:{r}} = chart;
+    const cx=r.xCenter, cy=r.yCenter;
+
+    chart.data.datasets[0].data.forEach((v,i)=>{
+      const pt=r.getPointPositionForValue(i,v);
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.lineTo(pt.x,pt.y);
+      ctx.lineWidth=4;
+      ctx.strokeStyle=colors[i];
+      ctx.stroke();
+    });
+  }
+};
+
+function render(){
+
+  document.getElementById("app").innerHTML = labels.map((l,i)=>`
+    <div class="card ${classMap[i]}">
+
+      <div class="header">
+        <div>${l}</div>
+        <div class="value">${state[i]}</div>
+      </div>
+
+      <div class="control-row">
+        <button onclick="adjust(${i},-1)">⬅</button>
+
+        <input type="range" min="-3" max="3"
+        value="${state[i]}"
+        oninput="update(${i},this.value);showInsight(${i})">
+
+        <button onclick="adjust(${i},1)">➡</button>
+      </div>
+
+    </div>
+  `).join("");
+
+  draw();
+}
+
+function update(i,v){
+  state[i]=Number(v);
+  render();
+}
+
+function adjust(i,d){
+  state[i]=Math.max(-3,Math.min(3,state[i]+d));
+  render();
+  showInsight(i);
+}
+
+function resetAll(){
+  state=[0,0,0,0,0];
+  render();
+  document.getElementById("insight").innerHTML="請操作或點擊任一力";
+}
+
+function draw(){
+
+  if(chart) chart.destroy();
+
+  chart=new Chart(document.getElementById("radar"),{
+    type:'radar',
+    data:{
+      labels:labels,
+      datasets:[{
+        data:state,
+        showLine:false,
+        fill:false,
+        pointBackgroundColor:colors,
+        pointRadius:6
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{ display:false }
+      },
+      scales:{
+        r:{ min:-3,max:3 }
+      },
+      onClick:(e,els)=>{
+        if(els.length){
+          showInsight(els[0].index);
+        }
+      }
+    },
+    plugins:[vectorPlugin]
+  });
+}
+
+render();
+
 </script>
+
+</body>
+</html>
