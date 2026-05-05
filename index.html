@@ -9,12 +9,20 @@
 body { font-family: sans-serif; padding:20px; }
 .card { margin-bottom:15px; padding:10px; border:1px solid #ddd; border-radius:8px;}
 .question { color:#555; margin-top:5px; }
+select { margin-bottom:15px; padding:5px; }
 </style>
 </head>
 
 <body>
 
 <h1>五力互動系統</h1>
+
+<label>情境：</label>
+<select id="context" onchange="render()">
+  <option value="work">工作</option>
+  <option value="relationship">關係</option>
+  <option value="family">家庭</option>
+</select>
 
 <div id="app">載入中...</div>
 
@@ -23,12 +31,16 @@ try {
 
 const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
 
-let state = [0,0,0,0,0];
+// ⭐ 每個情境一組五力
+let state = {
+  work: [0,0,0,0,0],
+  relationship: [0,0,0,0,0],
+  family: [0,0,0,0,0]
+};
 
-// ⭐ 每一力的提問（三段）
 const questions = [
   ["我是不是太沒有界線？","我現在的界線適當嗎？","我是不是太封閉？"],
-  ["我是不是忽略自己？","我有在平衡照顧嗎？","我是不是過度付出？"],
+  ["我是不是忽略自己或他人？","我有在平衡照顧嗎？","我是不是過度付出？"],
   ["我看到的是事實還是猜測？","我理解夠清楚嗎？","我是不是想太多？"],
   ["我有表達自己嗎？","我有自然展現嗎？","我是不是太衝動或失控？"],
   ["我有保持彈性嗎？","我調整得合適嗎？","我是不是變來變去或過度適應？"]
@@ -48,17 +60,20 @@ function getQuestion(i, val){
 
 function render() {
   const app = document.getElementById("app");
+  const ctx = document.getElementById("context").value;
 
   let html = "";
 
   labels.forEach((label,i)=>{
+    const val = state[ctx][i];
+
     html += `
       <div class="card">
-        <h3>${label}：${state[i]}</h3>
-        <input type="range" min="-3" max="3" value="${state[i]}"
+        <h3>${label}：${val}</h3>
+        <input type="range" min="-3" max="3" value="${val}"
           oninput="update(${i}, this.value)">
-        <p>狀態：${getText(state[i])}</p>
-        <p class="question">提問：${getQuestion(i, state[i])}</p>
+        <p>狀態：${getText(val)}</p>
+        <p class="question">提問：${getQuestion(i, val)}</p>
       </div>
     `;
   });
@@ -67,7 +82,8 @@ function render() {
 }
 
 function update(i,val){
-  state[i] = Number(val);
+  const ctx = document.getElementById("context").value;
+  state[ctx][i] = Number(val);
   render();
 }
 
