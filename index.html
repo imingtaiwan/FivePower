@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FivePower v6</title>
+<title>FivePower v7</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -61,7 +61,7 @@ button {
 
 <body>
 
-<h1>五力互動系統 v6（模式可切換版）</h1>
+<h1>五力互動系統 v7 </h1>
 
 <label>情境：</label>
 <select id="context" onchange="render()">
@@ -72,7 +72,6 @@ button {
 
 <br><br>
 
-<!-- ⭐ 模式切換 -->
 <button id="dotBtn" onclick="setMode('dot')" class="active">點模式</button>
 <button id="lineBtn" onclick="setMode('line')">微線模式</button>
 
@@ -92,7 +91,6 @@ button {
 try {
 
 const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
-
 const colors = ["#d98880","#7fb3d5","#bb8fce","#f5b041","#82e0aa"];
 
 let mode = "dot";
@@ -129,10 +127,8 @@ let chart=null;
 
 function setMode(m){
   mode = m;
-
   document.getElementById("dotBtn").classList.toggle("active", m==="dot");
   document.getElementById("lineBtn").classList.toggle("active", m==="line");
-
   updateChart();
 }
 
@@ -199,7 +195,8 @@ function resetAll(){
 function updateChart(){
   if(typeof Chart==="undefined") return;
 
-  const data = state[document.getElementById("context").value];
+  const ctxName = document.getElementById("context").value;
+  const data = state[ctxName];
 
   if(chart) chart.destroy();
 
@@ -209,12 +206,10 @@ function updateChart(){
       labels:labels,
       datasets:[{
         data:data,
-
         showLine: mode==="line",
         fill:false,
         borderColor:"rgba(80,80,80,0.3)",
         borderWidth:1.5,
-
         pointBackgroundColor:colors,
         pointBorderColor:"#fff",
         pointBorderWidth:2,
@@ -222,7 +217,22 @@ function updateChart(){
       }]
     },
     options:{
-      plugins:{ legend:{ display:false }},
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          callbacks:{
+            label:function(context){
+              const i = context.dataIndex;
+              const v = context.raw;
+              return [
+                labels[i] + "：" + v,
+                "狀態：" + getText(v),
+                "👉 " + getQuestion(i,v)
+              ];
+            }
+          }
+        }
+      },
       scales:{
         r:{
           min:-3,
