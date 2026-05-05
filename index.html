@@ -26,12 +26,13 @@ body { font-family: sans-serif; padding:20px; }
 .question { color:#555; }
 
 button {
-  margin:3px;
   padding:6px 10px;
   cursor:pointer;
 }
 
 .action {
+  display:flex;
+  justify-content: space-between;
   margin-top:8px;
 }
 
@@ -117,15 +118,14 @@ function render(){
     <div class="card">
       <h3>${label}：${val}</h3>
 
-      <!-- 滑桿 -->
       <input type="range" min="-3" max="3" value="${val}"
         oninput="update(${i}, this.value)">
 
-      <!-- 心理動作按鈕 -->
+      <!-- 🔥 調整後：收斂 - 穩定 - 補強 -->
       <div class="action">
-        <button onclick="adjust(${i}, 1)">⬆ 補強</button>
+        <button onclick="adjust(${i}, -1)">⬅ 收斂</button>
         <button onclick="setMid(${i})">● 穩定</button>
-        <button onclick="adjust(${i}, -1)">⬇ 收斂</button>
+        <button onclick="adjust(${i}, 1)">補強 ➡</button>
       </div>
 
       <p>狀態：${getText(val)}</p>
