@@ -30,10 +30,21 @@ button {
   cursor:pointer;
 }
 
+/* ✅ 修正按鈕排列（關鍵） */
 .action {
-  display:flex;
-  justify-content: space-between;
-  margin-top:8px;
+  display: flex;
+  justify-content: center;   /* 置中 */
+  gap: 12px;                 /* 固定間距 */
+  margin-top: 8px;
+}
+
+.action button {
+  min-width: 80px;           /* 視覺一致 */
+}
+
+/* 中間「穩定」突出 */
+.action button:nth-child(2) {
+  font-weight: bold;
 }
 
 #chartBox { align-self: start; }
@@ -121,7 +132,6 @@ function render(){
       <input type="range" min="-3" max="3" value="${val}"
         oninput="update(${i}, this.value)">
 
-      <!-- 🔥 調整後：收斂 - 穩定 - 補強 -->
       <div class="action">
         <button onclick="adjust(${i}, -1)">⬅ 收斂</button>
         <button onclick="setMid(${i})">● 穩定</button>
