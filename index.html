@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FivePower</title>
+<title>FivePower v4</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -87,7 +87,6 @@ try {
 
 const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
 
-/* ⭐ 五力顏色（方案A） */
 const colors = [
   "#d98880",
   "#7fb3d5",
@@ -192,7 +191,7 @@ function resetAll(){
   render();
 }
 
-/* ⭐ 雷達圖（已優化視覺） */
+/* ⭐ v4 雷達圖（正負分界版） */
 function updateChart(){
   if(typeof Chart==="undefined") return;
 
@@ -201,20 +200,34 @@ function updateChart(){
 
   if(chart) chart.destroy();
 
+  const positive = data.map(v => v > 0 ? v : 0);
+  const negative = data.map(v => v < 0 ? v : 0);
+
   chart = new Chart(document.getElementById("radar"), {
     type:'radar',
     data:{
       labels:labels,
-      datasets:[{
-        data:data,
-        fill:false,
-        borderColor:"rgba(100,100,100,0.4)",
-        borderWidth:2,
-        pointBackgroundColor:colors,
-        pointBorderColor:"#fff",
-        pointBorderWidth:2,
-        pointRadius:5
-      }]
+      datasets:[
+        {
+          data: positive,
+          fill:true,
+          backgroundColor:"rgba(46,204,113,0.12)",
+          borderColor:"rgba(46,204,113,0.5)",
+          borderWidth:2,
+          pointBackgroundColor:colors,
+          pointBorderColor:"#fff",
+          pointBorderWidth:2,
+          pointRadius:5
+        },
+        {
+          data: negative,
+          fill:true,
+          backgroundColor:"rgba(231,76,60,0.12)",
+          borderColor:"rgba(231,76,60,0.5)",
+          borderWidth:2,
+          pointRadius:0
+        }
+      ]
     },
     options:{
       plugins:{
@@ -224,9 +237,10 @@ function updateChart(){
         r:{
           min:-3,
           max:3,
-          ticks:{ stepSize:1 },
-          grid:{ color:"rgba(0,0,0,0.1)" },
-          angleLines:{ color:"rgba(0,0,0,0.1)" }
+          ticks:{ stepSize:1, backdropColor:"transparent" },
+          grid:{ color:"rgba(0,0,0,0.08)" },
+          angleLines:{ color:"rgba(0,0,0,0.08)" },
+          pointLabels:{ color:"#444", font:{ size:12 } }
         }
       }
     }
