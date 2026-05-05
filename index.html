@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FivePower v7</title>
+<title>FivePower v7.1</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -61,7 +61,7 @@ button {
 
 <body>
 
-<h1>五力互動系統 v7 </h1>
+<h1>五力互動系統 v7.1</h1>
 
 <label>情境：</label>
 <select id="context" onchange="render()">
@@ -195,8 +195,8 @@ function resetAll(){
 function updateChart(){
   if(typeof Chart==="undefined") return;
 
-  const ctxName = document.getElementById("context").value;
-  const data = state[ctxName];
+  const data = state[document.getElementById("context").value];
+  const baseline = [0,0,0,0,0];
 
   if(chart) chart.destroy();
 
@@ -204,17 +204,27 @@ function updateChart(){
     type:'radar',
     data:{
       labels:labels,
-      datasets:[{
-        data:data,
-        showLine: mode==="line",
-        fill:false,
-        borderColor:"rgba(80,80,80,0.3)",
-        borderWidth:1.5,
-        pointBackgroundColor:colors,
-        pointBorderColor:"#fff",
-        pointBorderWidth:2,
-        pointRadius:6
-      }]
+      datasets:[
+        {
+          data:baseline,
+          fill:true,
+          backgroundColor:"rgba(150,150,150,0.08)",
+          borderColor:"rgba(150,150,150,0.2)",
+          borderWidth:1,
+          pointRadius:0
+        },
+        {
+          data:data,
+          showLine: mode==="line",
+          fill:false,
+          borderColor:"rgba(80,80,80,0.3)",
+          borderWidth:1.5,
+          pointBackgroundColor:colors,
+          pointBorderColor:"#fff",
+          pointBorderWidth:2,
+          pointRadius:6
+        }
+      ]
     },
     options:{
       plugins:{
