@@ -5,11 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FivePower</title>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+
 <style>
 body { font-family: sans-serif; padding:20px; }
 .card { margin-bottom:15px; padding:10px; border:1px solid #ddd; border-radius:8px;}
 .question { color:#555; margin-top:5px; }
 select { margin-bottom:15px; padding:5px; }
+#chartBox { margin-top:20px; }
 </style>
 </head>
 
@@ -24,14 +27,19 @@ select { margin-bottom:15px; padding:5px; }
   <option value="family">家庭</option>
 </select>
 
-<div id="app">載入中...</div>
+<button onclick="toggleChart()">顯示/隱藏雷達圖</button>
+
+<div id="app"></div>
+
+<div id="chartBox" style="display:none;">
+  <canvas id="radar"></canvas>
+</div>
 
 <script>
 try {
 
 const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
 
-// ⭐ 每個情境一組五力
 let state = {
   work: [0,0,0,0,0],
   relationship: [0,0,0,0,0],
@@ -42,13 +50,13 @@ const questions = [
   ["我是不是太沒有界線？","我現在的界線適當嗎？","我是不是太封閉？"],
   ["我是不是忽略自己或他人？","我有在平衡照顧嗎？","我是不是過度付出？"],
   ["我看到的是事實還是猜測？","我理解夠清楚嗎？","我是不是想太多？"],
-  ["我有表達自己嗎？","我有自然展現嗎？","我是不是太衝動或失控？"],
+  ["我有表達自己嗎？","我有自在展現嗎？","我是不是太衝動或失控？"],
   ["我有保持彈性嗎？","我調整得合適嗎？","我是不是變來變去或過度適應？"]
 ];
 
 function getText(val){
-  if(val <= -2) return "偏低（不足）";
-  if(val >= 2) return "偏高（過度）";
+  if(val <= -2) return "偏低";
+  if(val >= 2) return "偏高";
   return "適中";
 }
 
@@ -57,6 +65,8 @@ function getQuestion(i, val){
   if(val >= 2) return questions[i][2];
   return questions[i][1];
 }
+
+let chart = null;
 
 function render() {
   const app = document.getElementById("app");
@@ -79,12 +89,52 @@ function render() {
   });
 
   app.innerHTML = html;
+
+  updateChart();
 }
 
 function update(i,val){
   const ctx = document.getElementById("context").value;
   state[ctx][i] = Number(val);
   render();
+}
+
+function toggleChart(){
+  const box = document.getElementById("chartBox");
+  box.style.display = box.style.display === "none" ? "block" : "none";
+  updateChart();
+}
+
+function updateChart(){
+  if(typeof Chart === "undefined") return;
+
+  const ctxName = document.getElementById("context").value;
+  const data = state[ctxName];
+
+  if(chart){
+    chart.destroy();
+  }
+
+  const ctx = document.getElementById("radar");
+
+  chart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: ctxName,
+        data: data
+      }]
+    },
+    options: {
+      scales: {
+        r: {
+          min: -3,
+          max: 3
+        }
+      }
+    }
+  });
 }
 
 render();
