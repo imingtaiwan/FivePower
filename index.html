@@ -3,10 +3,11 @@
 <head>
 
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>FivePower（完整版）</title>
+<title>FivePower v9</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -17,16 +18,23 @@ body { font-family: sans-serif; padding:16px; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  align-items: start;
+}
+
+.rightPanel {
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
 .chartBox {
-  height: 400px;
+  height:320px;
 }
 
-canvas {
-  width:100% !important;
-  height:100% !important;
+.panel {
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:12px;
+  background:#fafafa;
 }
 
 .card {
@@ -48,8 +56,8 @@ canvas {
 }
 
 .value {
-  font-size:18px;
   font-weight:bold;
+  font-size:18px;
 }
 
 .control-row {
@@ -58,7 +66,7 @@ canvas {
   margin-top:6px;
 }
 
-input[type="range"] { flex:1; }
+input { flex:1; }
 
 button {
   padding:4px 8px;
@@ -68,25 +76,39 @@ button {
 
 .question { font-size:13px; color:#555; }
 
-@media (max-width:768px){
-  .container { grid-template-columns:1fr; }
-  .chartBox { height:300px; }
+.title {
+  font-weight:bold;
+  margin-bottom:6px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>五力互動系統（完整穩定版）</h2>
+<h2>五力互動系統 v9 </h2>
 
 <button onclick="resetAll()">重置</button>
 
 <div class="container">
+
+  <!-- 左側 -->
   <div id="app"></div>
 
-  <div class="chartBox">
-    <canvas id="radar"></canvas>
+  <!-- 右側 -->
+  <div class="rightPanel">
+
+    <div class="chartBox">
+      <canvas id="radar"></canvas>
+    </div>
+
+    <!-- ⭐ 解讀區 -->
+    <div class="panel" id="insight">
+      <div class="title">解讀區</div>
+      <div>請點擊任一力</div>
+    </div>
+
   </div>
+
 </div>
 
 <script>
@@ -117,6 +139,12 @@ function getQuestion(i,v){
   return questions[i][1];
 }
 
+function getAdvice(v){
+  if(v<=-2) return "👉 建議：補強此力的使用";
+  if(v>=2) return "👉 建議：適度收斂";
+  return "👉 建議：維持目前狀態";
+}
+
 let chart;
 
 /* 向量線 */
@@ -141,6 +169,7 @@ const vectorPlugin = {
 };
 
 function render(){
+
   document.getElementById("app").innerHTML = labels.map((l,i)=>`
     <div class="card ${classMap[i]}">
 
@@ -154,7 +183,7 @@ function render(){
 
         <input type="range" min="-3" max="3"
         value="${state[i]}"
-        oninput="update(${i},this.value)">
+        oninput="update(${i},this.value);showInsight(${i})">
 
         <button onclick="adjust(${i},1)">➡</button>
       </div>
@@ -177,18 +206,32 @@ function update(i,v){
 function adjust(i,d){
   state[i]=Math.max(-3,Math.min(3,state[i]+d));
   render();
+  showInsight(i);
 }
 
 function resetAll(){
   state=[0,0,0,0,0];
   render();
+  document.getElementById("insight").innerHTML = "請點擊任一力";
+}
+
+function showInsight(i){
+
+  const v = state[i];
+
+  document.getElementById("insight").innerHTML = `
+    <div class="title">${labels[i]}：${v}（${getText(v)}）</div>
+    <div>${getQuestion(i,v)}</div>
+    <br>
+    <div>${getAdvice(v)}</div>
+  `;
 }
 
 function draw(){
 
   if(chart) chart.destroy();
 
-  chart=new Chart(document.getElementById("radar"),{
+  chart = new Chart(document.getElementById("radar"),{
     type:'radar',
     data:{
       labels:labels,
@@ -203,11 +246,8 @@ function draw(){
     options:{
       responsive:true,
       maintainAspectRatio:false,
-
       plugins:{
         legend:{ display:false },
-
-        /* ⭐ 心理提示回來了 */
         tooltip:{
           callbacks:{
             label:(c)=>{
@@ -215,17 +255,24 @@ function draw(){
               const v=c.raw;
               return [
                 labels[i]+"："+v,
-                "狀態："+getText(v),
                 "👉 "+getQuestion(i,v)
               ];
             }
           }
         }
       },
-
       scales:{
         r:{ min:-3,max:3 }
+      },
+
+      /* ⭐ 點擊事件 */
+      onClick:(e, elements)=>{
+        if(elements.length>0){
+          const i = elements[0].index;
+          showInsight(i);
+        }
       }
+
     },
     plugins:[vectorPlugin]
   });
