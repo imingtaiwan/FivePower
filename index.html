@@ -19,47 +19,49 @@ body { font-family: sans-serif; padding:20px; }
 .card {
   margin-bottom:15px;
   padding:12px;
-  border:1px solid #ddd;
   border-radius:10px;
+  border:1px solid #ddd;
 }
 
 .question { color:#555; }
 
+/* ⭐ 五力顏色（方案A） */
+.gate   { background:#fdecea; }
+.care   { background:#eaf2fb; }
+.clear  { background:#f3ecfb; }
+.actionc{ background:#fef5e7; }
+.adapt  { background:#eafaf1; }
+
 button {
   padding:6px 10px;
   cursor:pointer;
+  border:none;
+  border-radius:6px;
 }
 
-/* ✅ 修正按鈕排列（關鍵） */
+/* 按鈕排列 */
 .action {
-  display: flex;
-  justify-content: center;   /* 置中 */
-  gap: 12px;                 /* 固定間距 */
-  margin-top: 8px;
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-top:8px;
 }
 
-.action button {
-  min-width: 80px;           /* 視覺一致 */
-}
-
-/* 中間「穩定」突出 */
 .action button:nth-child(2) {
-  font-weight: bold;
+  font-weight:bold;
 }
 
-#chartBox { align-self: start; }
+#chartBox { align-self:start; }
 
-@media (max-width: 768px) {
-  .container {
-    grid-template-columns: 1fr;
-  }
+@media (max-width:768px){
+  .container { grid-template-columns:1fr; }
 }
 </style>
 </head>
 
 <body>
 
-<h1>五力互動系統</h1>
+<h1>五力互動系統（溫和版）</h1>
 
 <label>情境：</label>
 <select id="context" onchange="render()">
@@ -85,6 +87,15 @@ button {
 try {
 
 const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
+
+/* ⭐ 顏色語意（方案A） */
+const colors = [
+  "#d98880", // 守門
+  "#7fb3d5", // 照顧
+  "#bb8fce", // 釐清
+  "#f5b041", // 自發
+  "#82e0aa"  // 調適
+];
 
 function empty(){ return [0,0,0,0,0]; }
 
@@ -125,8 +136,10 @@ function render(){
   labels.forEach((label,i)=>{
     let val = state[ctx][i];
 
+    const classMap = ["gate","care","clear","actionc","adapt"];
+
     html += `
-    <div class="card">
+    <div class="card ${classMap[i]}">
       <h3>${label}：${val}</h3>
 
       <input type="range" min="-3" max="3" value="${val}"
@@ -193,10 +206,25 @@ function updateChart(){
     type:'radar',
     data:{
       labels:labels,
-      datasets:[{data:data}]
+      datasets:[{
+        data:data,
+        fill:true,
+        backgroundColor:"rgba(0,0,0,0.05)",
+        borderColor:"#666",
+        pointBackgroundColor:colors
+      }]
     },
     options:{
-      scales:{ r:{ min:-3, max:3 } }
+      plugins:{
+        legend:{ display:false }
+      },
+      scales:{
+        r:{
+          min:-3,
+          max:3,
+          ticks:{ stepSize:1 }
+        }
+      }
     }
   });
 }
