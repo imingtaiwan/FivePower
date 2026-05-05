@@ -30,14 +30,14 @@ body { font-family: sans-serif; padding:20px; }
 
 select, button {
   margin-bottom:15px;
-  padding:5px;
+  padding:6px;
+  margin-right:8px;
 }
 
 #chartBox {
   align-self: start;
 }
 
-/* 手機版 */
 @media (max-width: 768px) {
   .container {
     grid-template-columns: 1fr;
@@ -57,13 +57,16 @@ select, button {
   <option value="family">家庭</option>
 </select>
 
+<!-- ✅ 新增重置按鈕 -->
+<button onclick="resetCurrent()">重置此情境</button>
+<button onclick="resetAll()">全部重置</button>
+
 <button onclick="toggleChart()">顯示/隱藏雷達圖</button>
 
 <div class="container">
 
   <div id="app"></div>
 
-  <!-- 預設顯示雷達圖 -->
   <div id="chartBox" style="display:block;">
     <canvas id="radar"></canvas>
   </div>
@@ -75,10 +78,14 @@ try {
 
 const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
 
+function createEmpty(){
+  return [0,0,0,0,0];
+}
+
 let state = {
-  work: [0,0,0,0,0],
-  relationship: [0,0,0,0,0],
-  family: [0,0,0,0,0]
+  work: createEmpty(),
+  relationship: createEmpty(),
+  family: createEmpty()
 };
 
 const questions = [
@@ -131,6 +138,21 @@ function render() {
 function update(i,val){
   const ctx = document.getElementById("context").value;
   state[ctx][i] = Number(val);
+  render();
+}
+
+/* ✅ 重置當前情境 */
+function resetCurrent(){
+  const ctx = document.getElementById("context").value;
+  state[ctx] = createEmpty();
+  render();
+}
+
+/* ✅ 全部重置 */
+function resetAll(){
+  state.work = createEmpty();
+  state.relationship = createEmpty();
+  state.family = createEmpty();
   render();
 }
 
