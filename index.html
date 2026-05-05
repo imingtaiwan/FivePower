@@ -9,10 +9,40 @@
 
 <style>
 body { font-family: sans-serif; padding:20px; }
-.card { margin-bottom:15px; padding:10px; border:1px solid #ddd; border-radius:8px;}
-.question { color:#555; margin-top:5px; }
-select { margin-bottom:15px; padding:5px; }
-#chartBox { margin-top:20px; }
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.card {
+  margin-bottom:15px;
+  padding:10px;
+  border:1px solid #ddd;
+  border-radius:8px;
+}
+
+.question {
+  color:#555;
+  margin-top:5px;
+}
+
+select, button {
+  margin-bottom:15px;
+  padding:5px;
+}
+
+#chartBox {
+  align-self: start;
+}
+
+/* 手機版 */
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 
@@ -29,10 +59,15 @@ select { margin-bottom:15px; padding:5px; }
 
 <button onclick="toggleChart()">顯示/隱藏雷達圖</button>
 
-<div id="app"></div>
+<div class="container">
 
-<div id="chartBox" style="display:none;">
-  <canvas id="radar"></canvas>
+  <div id="app"></div>
+
+  <!-- 預設顯示雷達圖 -->
+  <div id="chartBox" style="display:block;">
+    <canvas id="radar"></canvas>
+  </div>
+
 </div>
 
 <script>
