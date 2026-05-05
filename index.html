@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FivePower v8.3</title>
+<title>FivePower v8.3-final</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -16,17 +21,18 @@ body { font-family: sans-serif; padding:16px; }
   gap: 16px;
 }
 
+/* ⭐ 五力色塊回來了 */
+.gate   { background:#fdecea; }
+.care   { background:#eaf2fb; }
+.clear  { background:#f3ecfb; }
+.actionc{ background:#fef5e7; }
+.adapt  { background:#eafaf1; }
+
 .card {
   margin-bottom:10px;
   padding:8px;
   border-radius:10px;
   border:1px solid #ddd;
-}
-
-/* ⭐ 新增：數值區塊 */
-.value {
-  font-size:18px;
-  font-weight:bold;
 }
 
 .header {
@@ -35,63 +41,48 @@ body { font-family: sans-serif; padding:16px; }
   align-items:center;
 }
 
-.question { color:#555; font-size:13px; }
-
-.gate   { background:#fdecea; }
-.care   { background:#eaf2fb; }
-.clear  { background:#f3ecfb; }
-.actionc{ background:#fef5e7; }
-.adapt  { background:#eafaf1; }
-
-button {
-  padding:4px 8px;
-  cursor:pointer;
-  border:none;
-  border-radius:6px;
-  font-size:12px;
+.value {
+  font-size:18px;
+  font-weight:bold;
 }
+
+.question { color:#555; font-size:13px; }
 
 .control-row {
   display:flex;
-  align-items:center;
   gap:6px;
   margin-top:6px;
 }
 
-input[type="range"]{
-  flex:1;
-}
+input[type="range"]{ flex:1; }
 
-#chartBox { align-self:start; }
-
-@media (max-width:768px){
-  .container { grid-template-columns:1fr; }
+button {
+  padding:4px 8px;
+  border:none;
+  border-radius:6px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>五力互動系統 v8.3</h2>
+<h2>五力互動系統（最終穩定版）</h2>
 
 <button onclick="resetAll()">重置</button>
 
 <div class="container">
   <div id="app"></div>
-  <div id="chartBox">
-    <canvas id="radar"></canvas>
-  </div>
+  <canvas id="radar"></canvas>
 </div>
 
 <script>
-try {
 
 const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
 const colors = ["#d98880","#7fb3d5","#bb8fce","#f5b041","#82e0aa"];
 
-function empty(){ return [0,0,0,0,0]; }
+const classMap = ["gate","care","clear","actionc","adapt"];
 
-let state = empty();
+let state = [0,0,0,0,0];
 
 const questions = [
   ["我是不是太沒有界線？","我現在的界線適當嗎？","我是不是太封閉？"],
@@ -113,21 +104,22 @@ function getQuestion(i,v){
   return questions[i][1];
 }
 
-let chart=null;
+let chart;
 
+/* ⭐ 向量線 */
 const vectorPlugin = {
-  id: 'vectorLines',
+  id:'vectorLines',
   afterDatasetsDraw(chart){
     const {ctx, scales:{r}} = chart;
     const cx = r.xCenter;
     const cy = r.yCenter;
 
-    chart.data.datasets[0].data.forEach((value, i) => {
-      const pt = r.getPointPositionForValue(i, value);
+    chart.data.datasets[0].data.forEach((v,i)=>{
+      const pt = r.getPointPositionForValue(i,v);
 
       ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(pt.x, pt.y);
+      ctx.moveTo(cx,cy);
+      ctx.lineTo(pt.x,pt.y);
       ctx.lineWidth = 4;
       ctx.strokeStyle = colors[i];
       ctx.stroke();
@@ -136,68 +128,61 @@ const vectorPlugin = {
 };
 
 function render(){
-  const app = document.getElementById("app");
-  const classMap = ["gate","care","clear","actionc","adapt"];
 
-  app.innerHTML = labels.map((label,i)=>{
-    const val = state[i];
-
-    return `
+  document.getElementById("app").innerHTML = labels.map((label,i)=>`
     <div class="card ${classMap[i]}">
 
       <div class="header">
         <div>${label}</div>
-        <div class="value">${val}</div>
+        <div class="value">${state[i]}</div>
       </div>
 
       <div class="control-row">
-        <button onclick="adjust(${i}, -1)">⬅</button>
+        <button onclick="adjust(${i},-1)">⬅</button>
 
-        <input type="range" min="-3" max="3" value="${val}"
-          oninput="update(${i}, this.value)">
+        <input type="range" min="-3" max="3"
+        value="${state[i]}"
+        oninput="update(${i},this.value)">
 
         <button onclick="setMid(${i})">●</button>
-        <button onclick="adjust(${i}, 1)">➡</button>
+        <button onclick="adjust(${i},1)">➡</button>
       </div>
 
       <div class="question">
-        ${getText(val)}｜${getQuestion(i,val)}
+        ${getText(state[i])}｜${getQuestion(i,state[i])}
       </div>
 
-    </div>`;
-  }).join("");
+    </div>
+  `).join("");
 
-  updateChart();
+  draw();
 }
 
-function update(i,val){
-  state[i] = Number(val);
+function update(i,v){
+  state[i]=Number(v);
   render();
 }
 
-function adjust(i,delta){
-  let v = state[i] + delta;
-  v = Math.max(-3, Math.min(3, v));
-  state[i] = v;
+function adjust(i,d){
+  state[i]=Math.max(-3,Math.min(3,state[i]+d));
   render();
 }
 
 function setMid(i){
-  state[i] = 0;
+  state[i]=0;
   render();
 }
 
 function resetAll(){
-  state = empty();
+  state=[0,0,0,0,0];
   render();
 }
 
-function updateChart(){
-  if(typeof Chart==="undefined") return;
+function draw(){
 
   if(chart) chart.destroy();
 
-  chart = new Chart(document.getElementById("radar"), {
+  chart=new Chart(document.getElementById("radar"),{
     type:'radar',
     data:{
       labels:labels,
@@ -205,9 +190,8 @@ function updateChart(){
         data:state,
         showLine:false,
         fill:false,
+        backgroundColor:'transparent',
         pointBackgroundColor:colors,
-        pointBorderColor:"#fff",
-        pointBorderWidth:2,
         pointRadius:6
       }]
     },
@@ -216,24 +200,20 @@ function updateChart(){
         legend:{ display:false },
         tooltip:{
           callbacks:{
-            label:function(context){
-              const i = context.dataIndex;
-              const v = context.raw;
+            label:(c)=>{
+              const i=c.dataIndex;
+              const v=c.raw;
               return [
-                labels[i] + "：" + v,
-                "狀態：" + getText(v),
-                "👉 " + getQuestion(i,v)
+                labels[i]+"："+v,
+                "狀態："+getText(v),
+                "👉 "+getQuestion(i,v)
               ];
             }
           }
         }
       },
       scales:{
-        r:{
-          min:-3,
-          max:3,
-          ticks:{ stepSize:1, backdropColor:"transparent" }
-        }
+        r:{ min:-3,max:3 }
       }
     },
     plugins:[vectorPlugin]
@@ -242,9 +222,6 @@ function updateChart(){
 
 render();
 
-} catch(e){
-  document.body.innerHTML = "<h2>錯誤</h2>"+e;
-}
 </script>
 
 </body>
