@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FivePower v8.2</title>
+<title>FivePower v8.3</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -21,6 +21,18 @@ body { font-family: sans-serif; padding:16px; }
   padding:8px;
   border-radius:10px;
   border:1px solid #ddd;
+}
+
+/* ⭐ 新增：數值區塊 */
+.value {
+  font-size:18px;
+  font-weight:bold;
+}
+
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
 .question { color:#555; font-size:13px; }
@@ -60,7 +72,7 @@ input[type="range"]{
 
 <body>
 
-<h2>五力互動系統 v8.2（向量模式）</h2>
+<h2>五力互動系統 v8.3</h2>
 
 <button onclick="resetAll()">重置</button>
 
@@ -103,7 +115,6 @@ function getQuestion(i,v){
 
 let chart=null;
 
-/* ⭐ 向量線 plugin */
 const vectorPlugin = {
   id: 'vectorLines',
   afterDatasetsDraw(chart){
@@ -114,14 +125,12 @@ const vectorPlugin = {
     chart.data.datasets[0].data.forEach((value, i) => {
       const pt = r.getPointPositionForValue(i, value);
 
-      ctx.save();
       ctx.beginPath();
       ctx.moveTo(cx, cy);
       ctx.lineTo(pt.x, pt.y);
       ctx.lineWidth = 4;
       ctx.strokeStyle = colors[i];
       ctx.stroke();
-      ctx.restore();
     });
   }
 };
@@ -136,9 +145,9 @@ function render(){
     return `
     <div class="card ${classMap[i]}">
 
-      <div style="display:flex; justify-content:space-between;">
-        <strong>${label}</strong>
-        <span style="font-size:18px; font-weight:bold;">${val}</span>
+      <div class="header">
+        <div>${label}</div>
+        <div class="value">${val}</div>
       </div>
 
       <div class="control-row">
@@ -196,7 +205,6 @@ function updateChart(){
         data:state,
         showLine:false,
         fill:false,
-        borderWidth:0,
         pointBackgroundColor:colors,
         pointBorderColor:"#fff",
         pointBorderWidth:2,
@@ -224,9 +232,7 @@ function updateChart(){
         r:{
           min:-3,
           max:3,
-          ticks:{ stepSize:1, backdropColor:"transparent" },
-          grid:{ color:"rgba(0,0,0,0.08)" },
-          angleLines:{ color:"rgba(0,0,0,0.08)" }
+          ticks:{ stepSize:1, backdropColor:"transparent" }
         }
       }
     },
