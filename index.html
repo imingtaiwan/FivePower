@@ -25,7 +25,7 @@ body { font-family: sans-serif; padding:20px; }
 
 .question { color:#555; }
 
-/* ⭐ 五力顏色 */
+/* ⭐ 方案A柔和配色 */
 .gate   { background:#fdecea; }
 .care   { background:#eaf2fb; }
 .clear  { background:#f3ecfb; }
@@ -39,7 +39,6 @@ button {
   border-radius:6px;
 }
 
-/* 按鈕排列 */
 .action {
   display:flex;
   justify-content:center;
@@ -88,13 +87,13 @@ try {
 
 const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
 
-/* ⭐ 顏色語意（方案A） */
+/* ⭐ 五力顏色（方案A） */
 const colors = [
-  "#d98880", // 守門
-  "#7fb3d5", // 照顧
-  "#bb8fce", // 釐清
-  "#f5b041", // 自發
-  "#82e0aa"  // 調適
+  "#d98880",
+  "#7fb3d5",
+  "#bb8fce",
+  "#f5b041",
+  "#82e0aa"
 ];
 
 function empty(){ return [0,0,0,0,0]; }
@@ -132,11 +131,10 @@ function render(){
   const app = document.getElementById("app");
 
   let html="";
+  const classMap = ["gate","care","clear","actionc","adapt"];
 
   labels.forEach((label,i)=>{
     let val = state[ctx][i];
-
-    const classMap = ["gate","care","clear","actionc","adapt"];
 
     html += `
     <div class="card ${classMap[i]}">
@@ -194,6 +192,7 @@ function resetAll(){
   render();
 }
 
+/* ⭐ 雷達圖（已優化視覺） */
 function updateChart(){
   if(typeof Chart==="undefined") return;
 
@@ -208,10 +207,13 @@ function updateChart(){
       labels:labels,
       datasets:[{
         data:data,
-        fill:true,
-        backgroundColor:"rgba(0,0,0,0.05)",
-        borderColor:"#666",
-        pointBackgroundColor:colors
+        fill:false,
+        borderColor:"rgba(100,100,100,0.4)",
+        borderWidth:2,
+        pointBackgroundColor:colors,
+        pointBorderColor:"#fff",
+        pointBorderWidth:2,
+        pointRadius:5
       }]
     },
     options:{
@@ -222,7 +224,9 @@ function updateChart(){
         r:{
           min:-3,
           max:3,
-          ticks:{ stepSize:1 }
+          ticks:{ stepSize:1 },
+          grid:{ color:"rgba(0,0,0,0.1)" },
+          angleLines:{ color:"rgba(0,0,0,0.1)" }
         }
       }
     }
