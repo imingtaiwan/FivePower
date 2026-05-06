@@ -1,96 +1,131 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>FivePower v10</title>
+<title>五力互動系統 v11 </title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
 <style>
-body { font-family: sans-serif; padding:16px; }
 
-.container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+body{
+  font-family:sans-serif;
+  padding:16px;
+  background:#f8f8f8;
 }
 
-.rightPanel {
+.container{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.rightPanel{
   display:flex;
   flex-direction:column;
   gap:12px;
 }
 
-.chartBox {
-  height:320px;
+.chartBox{
+  height:360px;
+  background:white;
+  border-radius:12px;
+  padding:12px;
+  border:1px solid #ddd;
 }
 
-.card {
-  margin-bottom:10px;
+.card{
   padding:8px;
+  margin-bottom:10px;
   border-radius:10px;
   border:1px solid #ddd;
 }
 
-.gate   { background:#fdecea; }
-.care   { background:#eaf2fb; }
-.clear  { background:#f3ecfb; }
-.actionc{ background:#fef5e7; }
-.adapt  { background:#eafaf1; }
-
-.header {
-  display:flex;
-  justify-content:space-between;
+.gate{
+  background:#fdecea;
 }
 
-.value {
+.care{
+  background:#eaf2fb;
+}
+
+.clear{
+  background:#f3ecfb;
+}
+
+.action{
+  background:#fff9db;
+}
+
+.adapt{
+  background:#eafaf1;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.value{
   font-size:18px;
   font-weight:bold;
 }
 
-.control-row {
+.control-row{
   display:flex;
   gap:6px;
   margin-top:6px;
 }
 
-input { flex:1; }
+input{
+  flex:1;
+}
 
-button {
+button{
   padding:4px 8px;
   border:none;
   border-radius:6px;
+  cursor:pointer;
 }
 
-.panel {
+.panel{
+  background:white;
   border:1px solid #ddd;
   border-radius:10px;
   padding:12px;
-  background:#fafafa;
 }
 
-.title {
+.title{
   font-weight:bold;
-  margin-bottom:6px;
+  margin-bottom:8px;
 }
+
+@media(max-width:768px){
+
+  .container{
+    grid-template-columns:1fr;
+  }
+
+}
+
 </style>
 </head>
 
 <body>
 
-<h2>五力互動系統 v10（組合解讀）</h2>
+<h2>五力互動系統 v11</h2>
 
 <button onclick="resetAll()">重置</button>
 
 <div class="container">
 
+  <!-- 左側 -->
   <div id="app"></div>
 
+  <!-- 右側 -->
   <div class="rightPanel">
 
     <div class="chartBox">
@@ -98,7 +133,8 @@ button {
     </div>
 
     <div class="panel" id="insight">
-      請操作或點擊任一力
+      <div class="title">解讀區</div>
+      請操作滑桿或點擊雷達圖
     </div>
 
   </div>
@@ -107,182 +143,348 @@ button {
 
 <script>
 
-const labels = ["守門力","照顧力","釐清力","自發力","調適力"];
-const colors = ["#d98880","#7fb3d5","#bb8fce","#f5b041","#82e0aa"];
-const classMap = ["gate","care","clear","actionc","adapt"];
+/* ⭐ 人型排列順序 */
+const labels = [
+  "釐清力",
+  "照顧力",
+  "調適力",
+  "自發力",
+  "守門力"
+];
+
+/* ⭐ 對應色 */
+const colors = [
+  "#bb8fce", // 釐清（紫）
+  "#7fb3d5", // 照顧（藍）
+  "#82e0aa", // 調適（綠）
+  "#f4d03f", // 自發（黃）
+  "#d98880"  // 守門（紅）
+];
+
+/* ⭐ 卡片色 */
+const classMap = [
+  "clear",
+  "care",
+  "adapt",
+  "action",
+  "gate"
+];
 
 let state = [0,0,0,0,0];
 
 const questions = [
-  ["我是不是太沒有界線？","我現在的界線適當嗎？","我是不是太封閉？"],
-  ["我是不是忽略自己或他人？","我有在平衡照顧嗎？","我是不是過度付出？"],
-  ["我看到的是事實還是猜測？","我理解夠清楚嗎？","我是不是想太多？"],
-  ["我有表達自己嗎？","我有自在展現嗎？","我是不是太衝動？"],
-  ["我有保持彈性嗎？","我調整得合適嗎？","我是不是過度適應？"]
+  ["是否過度簡化？","理解是否清楚？","是否過度分析？"],
+  ["是否忽略自己？","照顧是否平衡？","是否過度付出？"],
+  ["是否過度僵化？","是否保持彈性？","是否過度迎合？"],
+  ["是否壓抑自己？","是否自然表達？","是否過度衝動？"],
+  ["界線是否不足？","界線是否適中？","是否過度封閉？"]
 ];
 
 function getText(v){
-  if(v<=-2) return "偏低";
-  if(v>=2) return "偏高";
+
+  if(v <= -2) return "偏低";
+
+  if(v >= 2) return "偏高";
+
   return "適中";
+
 }
 
 function getQuestion(i,v){
-  if(v<=-2) return questions[i][0];
-  if(v>=2) return questions[i][2];
+
+  if(v <= -2) return questions[i][0];
+
+  if(v >= 2) return questions[i][2];
+
   return questions[i][1];
+
 }
 
 function getAdvice(v){
-  if(v<=-2) return "👉 建議：補強此力";
-  if(v>=2) return "👉 建議：適度收斂";
-  return "👉 建議：維持";
+
+  if(v <= -2){
+    return "👉 建議：補強此力";
+  }
+
+  if(v >= 2){
+    return "👉 建議：適度收斂";
+  }
+
+  return "👉 建議：維持目前狀態";
+
 }
 
 /* ⭐ 組合解讀 */
+
 function getCombinationInsight(){
 
-  let r=[];
+  let r = [];
 
-  if(state[0]>=2 && state[1]<=-2){
+  /* 守門高 + 照顧低 */
+  if(state[4] >= 2 && state[1] <= -2){
     r.push("守門高 × 照顧低：防衛強，關係距離拉開");
   }
 
-  if(state[0]<=-2 && state[1]>=2){
+  /* 守門低 + 照顧高 */
+  if(state[4] <= -2 && state[1] >= 2){
     r.push("守門低 × 照顧高：容易過度付出");
   }
 
-  if(state[2]<=-2 && state[3]>=2){
-    r.push("釐清低 × 自發高：行動偏衝動");
+  /* 釐清低 + 自發高 */
+  if(state[0] <= -2 && state[3] >= 2){
+    r.push("釐清低 × 自發高：容易衝動行動");
   }
 
-  if(state[2]>=2 && state[3]<=-2){
-    r.push("釐清高 × 自發低：過度思考");
+  /* 釐清高 + 自發低 */
+  if(state[0] >= 2 && state[3] <= -2){
+    r.push("釐清高 × 自發低：容易過度思考");
   }
 
-  if(state[4]>=2 && state[0]<=-2){
+  /* 調適高 + 守門低 */
+  if(state[2] >= 2 && state[4] <= -2){
     r.push("調適高 × 守門低：容易過度迎合");
   }
 
   return r;
+
 }
 
 function showInsight(i){
 
   const v = state[i];
+
   const combo = getCombinationInsight();
 
   document.getElementById("insight").innerHTML = `
-    <div class="title">${labels[i]}：${v}（${getText(v)}）</div>
-    <div>${getQuestion(i,v)}</div>
+
+    <div class="title">
+      ${labels[i]}：${v}（${getText(v)}）
+    </div>
+
+    <div>
+      👉 ${getQuestion(i,v)}
+    </div>
+
     <br>
-    <div>${getAdvice(v)}</div>
+
+    <div>
+      ${getAdvice(v)}
+    </div>
 
     ${
-      combo.length
-      ? `<hr><div class="title">組合解讀</div>
-         ${combo.map(c=>`<div>• ${c}</div>`).join("")}`
-      : ""
+      combo.length > 0
+      ?
+      `
+      <hr>
+
+      <div class="title">組合解讀</div>
+
+      ${combo.map(c=>`<div>• ${c}</div>`).join("")}
+      `
+      :
+      ""
     }
+
   `;
+
 }
 
 let chart;
 
+/* ⭐ 向量線 */
+
 const vectorPlugin = {
+
   id:'vectorLines',
+
   afterDatasetsDraw(chart){
+
     const {ctx, scales:{r}} = chart;
-    const cx=r.xCenter, cy=r.yCenter;
+
+    const cx = r.xCenter;
+    const cy = r.yCenter;
 
     chart.data.datasets[0].data.forEach((v,i)=>{
-      const pt=r.getPointPositionForValue(i,v);
+
+      const pt = r.getPointPositionForValue(i,v);
+
       ctx.beginPath();
+
       ctx.moveTo(cx,cy);
+
       ctx.lineTo(pt.x,pt.y);
-      ctx.lineWidth=4;
-      ctx.strokeStyle=colors[i];
+
+      ctx.lineWidth = 4;
+
+      ctx.strokeStyle = colors[i];
+
       ctx.stroke();
+
     });
+
   }
+
 };
 
 function render(){
 
-  document.getElementById("app").innerHTML = labels.map((l,i)=>`
+  document.getElementById("app").innerHTML =
+  labels.map((l,i)=>`
+
     <div class="card ${classMap[i]}">
 
       <div class="header">
+
         <div>${l}</div>
+
         <div class="value">${state[i]}</div>
+
       </div>
 
       <div class="control-row">
+
         <button onclick="adjust(${i},-1)">⬅</button>
 
-        <input type="range" min="-3" max="3"
-        value="${state[i]}"
-        oninput="update(${i},this.value);showInsight(${i})">
+        <input
+          type="range"
+          min="-3"
+          max="3"
+          value="${state[i]}"
+          oninput="update(${i},this.value);showInsight(${i})"
+        >
 
         <button onclick="adjust(${i},1)">➡</button>
+
       </div>
 
     </div>
+
   `).join("");
 
   draw();
+
 }
 
 function update(i,v){
-  state[i]=Number(v);
+
+  state[i] = Number(v);
+
   render();
+
 }
 
 function adjust(i,d){
-  state[i]=Math.max(-3,Math.min(3,state[i]+d));
+
+  state[i] = Math.max(-3,Math.min(3,state[i] + d));
+
   render();
+
   showInsight(i);
+
 }
 
 function resetAll(){
-  state=[0,0,0,0,0];
+
+  state = [0,0,0,0,0];
+
   render();
-  document.getElementById("insight").innerHTML="請操作或點擊任一力";
+
+  document.getElementById("insight").innerHTML = `
+    <div class="title">解讀區</div>
+    請操作滑桿或點擊雷達圖
+  `;
+
 }
 
 function draw(){
 
   if(chart) chart.destroy();
 
-  chart=new Chart(document.getElementById("radar"),{
+  chart = new Chart(document.getElementById("radar"),{
+
     type:'radar',
+
     data:{
+
       labels:labels,
+
       datasets:[{
+
         data:state,
+
         showLine:false,
+
         fill:false,
+
         pointBackgroundColor:colors,
-        pointRadius:6
+
+        pointRadius:7
+
       }]
+
     },
+
     options:{
+
       responsive:true,
+
       maintainAspectRatio:false,
+
       plugins:{
-        legend:{ display:false }
-      },
-      scales:{
-        r:{ min:-3,max:3 }
-      },
-      onClick:(e,els)=>{
-        if(els.length){
-          showInsight(els[0].index);
+
+        legend:{
+          display:false
+        },
+
+        tooltip:{
+
+          callbacks:{
+
+            label:(c)=>{
+
+              const i = c.dataIndex;
+
+              const v = c.raw;
+
+              return [
+                labels[i] + "：" + v,
+                "狀態：" + getText(v),
+                "👉 " + getQuestion(i,v)
+              ];
+
+            }
+
+          }
+
         }
+
+      },
+
+      scales:{
+        r:{
+          min:-3,
+          max:3
+        }
+      },
+
+      onClick:(e,els)=>{
+
+        if(els.length){
+
+          const i = els[0].index;
+
+          showInsight(i);
+
+        }
+
       }
+
     },
+
     plugins:[vectorPlugin]
+
   });
+
 }
 
 render();
