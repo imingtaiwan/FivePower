@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>五力互動系統 v12｜</title>
+<title>五力互動系統 v12.1</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -37,17 +37,40 @@ body{
   padding:12px;
 }
 
+/* ⭐ 卡片 */
+
 .card{
   display:flex;
   align-items:center;
   gap:12px;
 
-  background:white;
   border-radius:12px;
   border:1px solid #ddd;
 
   padding:10px;
   margin-bottom:12px;
+}
+
+/* ⭐ 五力色彩 */
+
+.card:nth-child(1){
+  background:#f3ecfb;
+}
+
+.card:nth-child(2){
+  background:#eaf2fb;
+}
+
+.card:nth-child(3){
+  background:#eafaf1;
+}
+
+.card:nth-child(4){
+  background:#fff9db;
+}
+
+.card:nth-child(5){
+  background:#fdecea;
 }
 
 .iconBox{
@@ -78,7 +101,7 @@ body{
 }
 
 .value{
-  font-size:20px;
+  font-size:22px;
   font-weight:bold;
 }
 
@@ -97,6 +120,7 @@ button{
   border:none;
   border-radius:6px;
   cursor:pointer;
+  background:white;
 }
 
 .panel{
@@ -108,13 +132,13 @@ button{
 
 .title{
   font-weight:bold;
-  margin-bottom:8px;
+  margin-bottom:6px;
+  font-size:18px;
 }
 
 .sub{
   font-size:13px;
-  color:#666;
-  margin-top:4px;
+  color:#555;
 }
 
 @media(max-width:768px){
@@ -130,7 +154,7 @@ button{
 
 <body>
 
-<h2>五力互動系統 v12 </h2>
+<h2>五力互動系統 v12.1</h2>
 
 <button onclick="resetAll()">重置</button>
 
@@ -160,7 +184,7 @@ button{
 
 <script>
 
-/* ⭐ 人型順序 */
+/* ⭐ 人型排列 */
 
 const labels = [
   "釐清力",
@@ -170,6 +194,8 @@ const labels = [
   "守門力"
 ];
 
+/* ⭐ 對應色 */
+
 const colors = [
   "#bb8fce",
   "#7fb3d5",
@@ -178,6 +204,8 @@ const colors = [
   "#d98880"
 ];
 
+/* ⭐ 物件圖 */
+
 const icons = [
   "glasses.png",
   "water.png",
@@ -185,6 +213,8 @@ const icons = [
   "star.png",
   "key.png"
 ];
+
+/* ⭐ 副標 */
 
 const subtitles = [
   "聚焦觀察・理解脈絡",
@@ -195,6 +225,8 @@ const subtitles = [
 ];
 
 let state = [0,0,0,0,0];
+
+/* ⭐ 提問 */
 
 const questions = [
 
@@ -210,6 +242,8 @@ const questions = [
 
 ];
 
+/* ⭐ 狀態 */
+
 function getText(v){
 
   if(v <= -2) return "偏低";
@@ -220,6 +254,8 @@ function getText(v){
 
 }
 
+/* ⭐ 提問 */
+
 function getQuestion(i,v){
 
   if(v <= -2) return questions[i][0];
@@ -229,6 +265,8 @@ function getQuestion(i,v){
   return questions[i][1];
 
 }
+
+/* ⭐ 建議 */
 
 function getAdvice(v){
 
@@ -273,6 +311,8 @@ function getCombinationInsight(){
   return r;
 
 }
+
+/* ⭐ 解讀區 */
 
 function showInsight(i){
 
@@ -351,6 +391,8 @@ const vectorPlugin = {
 
 };
 
+/* ⭐ 卡片 render */
+
 function render(){
 
   document.getElementById("app").innerHTML =
@@ -368,8 +410,11 @@ function render(){
         <div class="header">
 
           <div>
+
             <div class="title">${l}</div>
+
             <div class="sub">${subtitles[i]}</div>
+
           </div>
 
           <div class="value">${state[i]}</div>
@@ -402,6 +447,8 @@ function render(){
 
 }
 
+/* ⭐ 更新 */
+
 function update(i,v){
 
   state[i] = Number(v);
@@ -409,6 +456,8 @@ function update(i,v){
   render();
 
 }
+
+/* ⭐ 加減 */
 
 function adjust(i,d){
 
@@ -419,6 +468,8 @@ function adjust(i,d){
   showInsight(i);
 
 }
+
+/* ⭐ 重置 */
 
 function resetAll(){
 
@@ -432,6 +483,8 @@ function resetAll(){
   `;
 
 }
+
+/* ⭐ 雷達圖 */
 
 function draw(){
 
@@ -484,9 +537,13 @@ function draw(){
               const v = c.raw;
 
               return [
+
                 labels[i] + "：" + v,
+
                 "狀態：" + getText(v),
+
                 "👉 " + getQuestion(i,v)
+
               ];
 
             }
