@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>五力互動系統 v12.1</title>
+<title>五力互動系統 v12.2</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -53,24 +53,24 @@ body{
 
 /* ⭐ 五力色彩 */
 
-.card:nth-child(1){
-  background:#f3ecfb;
+.card.gate{
+  background:#fdecea;
 }
 
-.card:nth-child(2){
+.card.care{
   background:#eaf2fb;
 }
 
-.card:nth-child(3){
-  background:#eafaf1;
+.card.clear{
+  background:#f3ecfb;
 }
 
-.card:nth-child(4){
+.card.action{
   background:#fff9db;
 }
 
-.card:nth-child(5){
-  background:#fdecea;
+.card.adapt{
+  background:#eafaf1;
 }
 
 .iconBox{
@@ -141,6 +141,16 @@ button{
   color:#555;
 }
 
+/* ⭐ 開發資訊 */
+
+.footer{
+  margin-top:18px;
+  text-align:right;
+  font-size:12px;
+  color:#777;
+  line-height:1.6;
+}
+
 @media(max-width:768px){
 
   .container{
@@ -154,7 +164,7 @@ button{
 
 <body>
 
-<h2>五力互動系統 v12.1</h2>
+<h2>五力互動系統 v12.2</h2>
 
 <button onclick="resetAll()">重置</button>
 
@@ -178,15 +188,31 @@ button{
 
     </div>
 
+    <!-- ⭐ 開發資訊 -->
+
+    <div class="footer">
+
+      Five Power Interactive System v12.2<br>
+
+      Developed by Iming Huang
+
+      <br><br>
+
+      Contact:<br>
+
+      fivepower.tw@gmail.com
+
+    </div>
+
   </div>
 
 </div>
 
 <script>
 
-/* ⭐ 人型排列 */
+/* ⭐ 雷達圖排列（人型） */
 
-const labels = [
+const radarLabels = [
   "釐清力",
   "照顧力",
   "調適力",
@@ -194,39 +220,60 @@ const labels = [
   "守門力"
 ];
 
-/* ⭐ 對應色 */
+/* ⭐ 左側顯示順序 */
 
-const colors = [
-  "#bb8fce",
-  "#7fb3d5",
-  "#82e0aa",
-  "#f4d03f",
-  "#d98880"
-];
+const cardData = [
 
-/* ⭐ 物件圖 */
+  {
+    label:"守門力",
+    color:"#d98880",
+    icon:"key.png",
+    sub:"界線管理・保護自己",
+    className:"gate",
+    radarIndex:4
+  },
 
-const icons = [
-  "glasses.png",
-  "water.png",
-  "bag.png",
-  "star.png",
-  "key.png"
-];
+  {
+    label:"照顧力",
+    color:"#7fb3d5",
+    icon:"water.png",
+    sub:"照顧自己・補充能量",
+    className:"care",
+    radarIndex:1
+  },
 
-/* ⭐ 副標 */
+  {
+    label:"釐清力",
+    color:"#bb8fce",
+    icon:"glasses.png",
+    sub:"聚焦觀察・理解脈絡",
+    className:"clear",
+    radarIndex:0
+  },
 
-const subtitles = [
-  "聚焦觀察・理解脈絡",
-  "照顧自己・補充能量",
-  "調整變化・維持彈性",
-  "啟動能量・自然表達",
-  "界線管理・保護自己"
+  {
+    label:"自發力",
+    color:"#f4d03f",
+    icon:"star.png",
+    sub:"啟動能量・自然表達",
+    className:"action",
+    radarIndex:3
+  },
+
+  {
+    label:"調適力",
+    color:"#82e0aa",
+    icon:"bag.png",
+    sub:"調整變化・維持彈性",
+    className:"adapt",
+    radarIndex:2
+  }
+
 ];
 
 let state = [0,0,0,0,0];
 
-/* ⭐ 提問 */
+/* ⭐ 問題 */
 
 const questions = [
 
@@ -242,8 +289,6 @@ const questions = [
 
 ];
 
-/* ⭐ 狀態 */
-
 function getText(v){
 
   if(v <= -2) return "偏低";
@@ -254,8 +299,6 @@ function getText(v){
 
 }
 
-/* ⭐ 提問 */
-
 function getQuestion(i,v){
 
   if(v <= -2) return questions[i][0];
@@ -265,8 +308,6 @@ function getQuestion(i,v){
   return questions[i][1];
 
 }
-
-/* ⭐ 建議 */
 
 function getAdvice(v){
 
@@ -312,8 +353,6 @@ function getCombinationInsight(){
 
 }
 
-/* ⭐ 解讀區 */
-
 function showInsight(i){
 
   const v = state[i];
@@ -323,7 +362,7 @@ function showInsight(i){
   document.getElementById("insight").innerHTML = `
 
     <div class="title">
-      ${labels[i]}：${v}（${getText(v)}）
+      ${radarLabels[i]}：${v}（${getText(v)}）
     </div>
 
     <div>
@@ -381,7 +420,7 @@ const vectorPlugin = {
 
       ctx.lineWidth = 4;
 
-      ctx.strokeStyle = colors[i];
+      ctx.strokeStyle = cardData.find(c=>c.radarIndex===i).color;
 
       ctx.stroke();
 
@@ -391,18 +430,18 @@ const vectorPlugin = {
 
 };
 
-/* ⭐ 卡片 render */
+/* ⭐ render */
 
 function render(){
 
   document.getElementById("app").innerHTML =
 
-  labels.map((l,i)=>`
+  cardData.map((c)=>`
 
-    <div class="card">
+    <div class="card ${c.className}">
 
       <div class="iconBox">
-        <img src="${icons[i]}">
+        <img src="${c.icon}">
       </div>
 
       <div class="content">
@@ -411,29 +450,29 @@ function render(){
 
           <div>
 
-            <div class="title">${l}</div>
+            <div class="title">${c.label}</div>
 
-            <div class="sub">${subtitles[i]}</div>
+            <div class="sub">${c.sub}</div>
 
           </div>
 
-          <div class="value">${state[i]}</div>
+          <div class="value">${state[c.radarIndex]}</div>
 
         </div>
 
         <div class="control-row">
 
-          <button onclick="adjust(${i},-1)">⬅</button>
+          <button onclick="adjust(${c.radarIndex},-1)">⬅</button>
 
           <input
             type="range"
             min="-3"
             max="3"
-            value="${state[i]}"
-            oninput="update(${i},this.value);showInsight(${i})"
+            value="${state[c.radarIndex]}"
+            oninput="update(${c.radarIndex},this.value);showInsight(${c.radarIndex})"
           >
 
-          <button onclick="adjust(${i},1)">➡</button>
+          <button onclick="adjust(${c.radarIndex},1)">➡</button>
 
         </div>
 
@@ -447,8 +486,6 @@ function render(){
 
 }
 
-/* ⭐ 更新 */
-
 function update(i,v){
 
   state[i] = Number(v);
@@ -456,8 +493,6 @@ function update(i,v){
   render();
 
 }
-
-/* ⭐ 加減 */
 
 function adjust(i,d){
 
@@ -468,8 +503,6 @@ function adjust(i,d){
   showInsight(i);
 
 }
-
-/* ⭐ 重置 */
 
 function resetAll(){
 
@@ -496,7 +529,7 @@ function draw(){
 
     data:{
 
-      labels:labels,
+      labels:radarLabels,
 
       datasets:[{
 
@@ -506,7 +539,13 @@ function draw(){
 
         fill:false,
 
-        pointBackgroundColor:colors,
+        pointBackgroundColor:[
+          "#bb8fce",
+          "#7fb3d5",
+          "#82e0aa",
+          "#f4d03f",
+          "#d98880"
+        ],
 
         pointRadius:7
 
@@ -538,7 +577,7 @@ function draw(){
 
               return [
 
-                labels[i] + "：" + v,
+                radarLabels[i] + "：" + v,
 
                 "狀態：" + getText(v),
 
