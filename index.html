@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -5,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>五力互動系統 v13</title>
+<title>五力互動系統 v14</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -198,7 +199,7 @@ button{
 
 <body>
 
-<h2>五力互動系統 v13</h2>
+<h2>五力互動系統 v14</h2>
 
 <button onclick="resetAll()">重置</button>
 
@@ -224,7 +225,7 @@ button{
 
     <div class="footer">
 
-      Five Power Interactive System v13<br>
+      Five Power Interactive System v14<br>
 
       Developed by Iming Huang
 
@@ -256,7 +257,6 @@ const cardData = [
     label:"守門力",
     sub:"界線管理・保護自己",
     color:"#d98880",
-    main:"key.png",
     base:"key",
     className:"gate",
     radarIndex:4
@@ -266,7 +266,6 @@ const cardData = [
     label:"照顧力",
     sub:"照顧自己・補充能量",
     color:"#7fb3d5",
-    main:"water.png",
     base:"water",
     className:"care",
     radarIndex:1
@@ -276,7 +275,6 @@ const cardData = [
     label:"釐清力",
     sub:"聚焦觀察・理解脈絡",
     color:"#bb8fce",
-    main:"glasses.png",
     base:"glasses",
     className:"clear",
     radarIndex:0
@@ -286,7 +284,6 @@ const cardData = [
     label:"自發力",
     sub:"啟動能量・自然表達",
     color:"#f4d03f",
-    main:"star.png",
     base:"star",
     className:"action",
     radarIndex:3
@@ -296,7 +293,6 @@ const cardData = [
     label:"調適力",
     sub:"調整變化・維持彈性",
     color:"#82e0aa",
-    main:"bag.png",
     base:"bag",
     className:"adapt",
     radarIndex:2
@@ -319,6 +315,24 @@ const questions = [
   ["是否界線不足？","界線是否適中？","是否過度封閉？"]
 
 ];
+
+
+/* ⭐ 主物件切換 */
+
+function getMainImage(base,value){
+
+  if(value <= -2){
+    return `${base}_low.png`;
+  }
+
+  if(value >= 2){
+    return `${base}_high.png`;
+  }
+
+  return `${base}_mid.png`;
+
+}
+
 
 function getText(v){
 
@@ -425,7 +439,7 @@ function render(){
 
       <div class="iconBox">
 
-        <img src="${c.main}">
+        <img src="${getMainImage(c.base,state[c.radarIndex])}">
 
       </div>
 
@@ -588,3 +602,4 @@ render();
 
 </body>
 </html>
+```
