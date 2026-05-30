@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>五力互動系統 v15</title>
+<title>五力互動系統 v16</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -131,8 +131,6 @@ button{
   background:white;
 }
 
-/* ⭐ 狀態映照 */
-
 .reflection{
 
   margin-top:12px;
@@ -148,8 +146,6 @@ button{
   line-height:1.8;
 
 }
-
-/* ⭐ footer */
 
 .footer{
   margin-top:18px;
@@ -172,7 +168,7 @@ button{
 
 <body>
 
-<h2>五力互動系統 v15</h2>
+<h2>五力互動系統 v16</h2>
 
 <button onclick="resetAll()">重置</button>
 
@@ -188,7 +184,7 @@ button{
 
     <div class="footer">
 
-      Five Power Interactive System v15<br>
+      Five Power Interactive System v16<br>
 
       Developed by Iming Huang
 
@@ -300,7 +296,7 @@ const reflections = [
 ];
 
 
-/* ⭐ 主物件 */
+/* 主物件 */
 
 function getMainImage(base,value){
 
@@ -317,7 +313,7 @@ function getMainImage(base,value){
 }
 
 
-/* ⭐ 狀態映照 */
+/* 狀態映照 */
 
 function getReflection(i,v){
 
@@ -326,9 +322,10 @@ function getReflection(i,v){
 }
 
 
-/* ⭐ 放射線 */
-
 let chart;
+
+
+/* 放射線 */
 
 const vectorPlugin = {
 
@@ -364,7 +361,7 @@ const vectorPlugin = {
 };
 
 
-/* ⭐ render */
+/* render */
 
 function render(){
 
@@ -398,11 +395,7 @@ function render(){
 
         </div>
 
-        <div class="reflection">
-
-          ${getReflection(c.radarIndex,state[c.radarIndex])}
-
-        </div>
+        <!-- ⭐ 滑桿 -->
 
         <div class="control-row">
 
@@ -425,6 +418,14 @@ function render(){
 
         </div>
 
+        <!-- ⭐ 狀態映照 -->
+
+        <div class="reflection">
+
+          ${getReflection(c.radarIndex,state[c.radarIndex])}
+
+        </div>
+
       </div>
 
     </div>
@@ -436,7 +437,7 @@ function render(){
 }
 
 
-/* ⭐ 更新 */
+/* 更新 */
 
 function update(i,v){
 
@@ -447,7 +448,7 @@ function update(i,v){
 }
 
 
-/* ⭐ 調整 */
+/* 按鈕調整 */
 
 function adjust(i,d){
 
@@ -458,7 +459,7 @@ function adjust(i,d){
 }
 
 
-/* ⭐ 重置 */
+/* 重置 */
 
 function resetAll(){
 
@@ -469,7 +470,7 @@ function resetAll(){
 }
 
 
-/* ⭐ 雷達圖 */
+/* 雷達圖 */
 
 function draw(){
 
