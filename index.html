@@ -37,8 +37,6 @@ body{
   padding:12px;
 }
 
-/* 卡片 */
-
 .card{
   display:flex;
   align-items:flex-start;
@@ -50,8 +48,6 @@ body{
   padding:12px;
   margin-bottom:12px;
 }
-
-/* 五力色彩 */
 
 .card.gate{
   background:#fdecea;
@@ -188,7 +184,7 @@ button{
         解讀區
       </div>
 
-      請操作滑桿或點擊雷達圖
+      請操作滑桿
 
     </div>
 
@@ -269,19 +265,45 @@ const cardData = [
 
 ];
 
-let state = [0,0,0,0,0];
 
-const questions = [
+/* 1=低 2=中 3=高 */
 
-  ["是否思考不周？","理解是否清楚？","是否過度分析？"],
+let state = [2,2,2,2,2];
 
-  ["是否忽略自己？","照顧是否平衡？","是否過度付出？"],
 
-  ["是否太過配合？","調整是否有彈性？","是否過度反應？"],
+/* 狀態映照 */
 
-  ["是否壓抑自己？","表達是否自在？","是否過度衝動？"],
+const reflections = [
 
-  ["是否界線不足？","界線是否適中？","是否過度設限？"]
+  [
+    "有些事情，好像還看不清楚。",
+    "客觀地評估事情的全貌。",
+    "好像有點想得太多。"
+  ],
+
+  [
+    "好像忘了好好照顧自己。",
+    "照顧自己的同時，也沒有忘記別人。",
+    "好像付出太多、忽略了自己。"
+  ],
+
+  [
+    "好像在勉強自己配合。",
+    "適度調整，保有舒適的狀態。",
+    "好像撐太久，快爆了。"
+  ],
+
+  [
+    "好像失去自己的聲音。",
+    "放心自在地表達自己。",
+    "好像有點太衝動了。"
+  ],
+
+  [
+    "有些界線，好像消失了。",
+    "保護自己，也保留與人的連結。",
+    "好像設下太多界線、太多限制了。"
+  ]
 
 ];
 
@@ -290,11 +312,11 @@ const questions = [
 
 function getMainImage(base,value){
 
-  if(value <= -2){
+  if(value === 1){
     return `${base}_low.png`;
   }
 
-  if(value >= 2){
+  if(value === 3){
     return `${base}_high.png`;
   }
 
@@ -303,28 +325,11 @@ function getMainImage(base,value){
 }
 
 
-function getQuestion(i,v){
+/* 狀態映照 */
 
-  if(v <= -2) return questions[i][0];
+function getReflection(i,v){
 
-  if(v >= 2) return questions[i][2];
-
-  return questions[i][1];
-
-}
-
-
-function getAdvice(v){
-
-  if(v <= -2){
-    return "👉 建議：再補充一點";
-  }
-
-  if(v >= 2){
-    return "👉 建議：稍微放鬆一下";
-  }
-
-  return "👉 建議：維持目前狀態";
+  return reflections[i][v-1];
 
 }
 
@@ -337,23 +342,18 @@ function showInsight(i){
 
     <div style="font-weight:bold;font-size:18px;margin-bottom:8px;">
 
-      ${radarLabels[i]}：${v}
+      ${radarLabels[i]}
 
     </div>
 
-    <div>
-      👉 ${getQuestion(i,v)}
-    </div>
-
-    <br>
-
-    <div>
-      ${getAdvice(v)}
+    <div style="line-height:1.8;">
+      ${getReflection(i,v)}
     </div>
 
   `;
 
 }
+
 
 let chart;
 
@@ -389,6 +389,7 @@ const vectorPlugin = {
   }
 
 };
+
 
 function render(){
 
@@ -436,8 +437,9 @@ function render(){
 
           <input
             type="range"
-            min="-3"
+            min="1"
             max="3"
+            step="1"
             value="${state[c.radarIndex]}"
             oninput="update(${c.radarIndex},this.value);showInsight(${c.radarIndex})"
           >
@@ -458,6 +460,7 @@ function render(){
 
 }
 
+
 function update(i,v){
 
   state[i] = Number(v);
@@ -466,9 +469,10 @@ function update(i,v){
 
 }
 
+
 function adjust(i,d){
 
-  state[i] = Math.max(-3,Math.min(3,state[i] + d));
+  state[i] = Math.max(1,Math.min(3,state[i] + d));
 
   render();
 
@@ -476,9 +480,10 @@ function adjust(i,d){
 
 }
 
+
 function resetAll(){
 
-  state = [0,0,0,0,0];
+  state = [2,2,2,2,2];
 
   render();
 
@@ -488,11 +493,12 @@ function resetAll(){
       解讀區
     </div>
 
-    請操作滑桿或點擊雷達圖
+    請操作滑桿
 
   `;
 
 }
+
 
 function draw(){
 
@@ -544,8 +550,11 @@ function draw(){
 
       scales:{
         r:{
-          min:-3,
-          max:3
+          min:1,
+          max:3,
+          ticks:{
+            stepSize:1
+          }
         }
       }
 
