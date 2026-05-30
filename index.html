@@ -313,6 +313,7 @@ function getQuestion(i,v){
 
 }
 
+
 function getAdvice(v){
 
   if(v <= -2){
@@ -326,6 +327,7 @@ function getAdvice(v){
   return "👉 建議：維持目前狀態";
 
 }
+
 
 function showInsight(i){
 
@@ -479,6 +481,16 @@ function resetAll(){
   state = [0,0,0,0,0];
 
   render();
+
+  document.getElementById("insight").innerHTML = `
+
+    <div style="font-weight:bold;margin-bottom:8px;">
+      解讀區
+    </div>
+
+    請操作滑桿或點擊雷達圖
+
+  `;
 
 }
 
