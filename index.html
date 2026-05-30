@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>五力互動系統 v14</title>
+<title>五力互動系統 v15</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
@@ -37,7 +37,7 @@ body{
   padding:12px;
 }
 
-/* ⭐ 卡片 */
+/* 卡片 */
 
 .card{
   display:flex;
@@ -51,7 +51,7 @@ body{
   margin-bottom:12px;
 }
 
-/* ⭐ 五力色彩 */
+/* 五力色彩 */
 
 .card.gate{
   background:#fdecea;
@@ -140,36 +140,6 @@ button{
   background:white;
 }
 
-/* ⭐ 狀態參照圖 */
-
-.stateGuide{
-
-  display:flex;
-
-  justify-content:center;
-
-  align-items:center;
-
-  gap:42px;
-
-  margin-top:8px;
-
-}
-
-/* ⭐ 狀態圖統一尺寸 */
-
-.stateGuide img{
-
-  width:72px;
-
-  height:72px;
-
-  object-fit:contain;
-
-  opacity:1;
-
-}
-
 .panel{
   background:white;
   border:1px solid #ddd;
@@ -198,7 +168,7 @@ button{
 
 <body>
 
-<h2>五力互動系統 v14</h2>
+<h2>五力互動系統 v15</h2>
 
 <button onclick="resetAll()">重置</button>
 
@@ -224,7 +194,7 @@ button{
 
     <div class="footer">
 
-      Five Power Interactive System v14<br>
+      Five Power Interactive System v15<br>
 
       Developed by Iming Huang
 
@@ -272,7 +242,7 @@ const cardData = [
 
   {
     label:"釐清力",
-    sub:"聚焦觀察・理解脈絡",
+    sub:"客觀觀察・理解脈絡",
     color:"#bb8fce",
     base:"glasses",
     className:"clear",
@@ -281,7 +251,7 @@ const cardData = [
 
   {
     label:"自發力",
-    sub:"啟動能量・自然表達",
+    sub:"啟動能量・自在表達",
     color:"#f4d03f",
     base:"star",
     className:"action",
@@ -303,20 +273,20 @@ let state = [0,0,0,0,0];
 
 const questions = [
 
-  ["是否過度簡化？","理解是否清楚？","是否過度分析？"],
+  ["是否思考不周？","理解是否清楚？","是否過度分析？"],
 
   ["是否忽略自己？","照顧是否平衡？","是否過度付出？"],
 
-  ["是否過度迎合？","調整是否有彈性？","是否過度反應？"],
+  ["是否太過配合？","調整是否有彈性？","是否過度反應？"],
 
   ["是否壓抑自己？","表達是否自在？","是否過度衝動？"],
 
-  ["是否界線不足？","界線是否適中？","是否過度封閉？"]
+  ["是否界線不足？","界線是否適中？","是否過度設限？"]
 
 ];
 
 
-/* ⭐ 主物件切換 */
+/* 主物件切換 */
 
 function getMainImage(base,value){
 
@@ -333,16 +303,6 @@ function getMainImage(base,value){
 }
 
 
-function getText(v){
-
-  if(v <= -2) return "偏低";
-
-  if(v >= 2) return "偏高";
-
-  return "適中";
-
-}
-
 function getQuestion(i,v){
 
   if(v <= -2) return questions[i][0];
@@ -356,11 +316,11 @@ function getQuestion(i,v){
 function getAdvice(v){
 
   if(v <= -2){
-    return "👉 建議：補強此力";
+    return "👉 建議：再補充一點";
   }
 
   if(v >= 2){
-    return "👉 建議：適度收斂";
+    return "👉 建議：稍微放鬆一下";
   }
 
   return "👉 建議：維持目前狀態";
@@ -375,7 +335,7 @@ function showInsight(i){
 
     <div style="font-weight:bold;font-size:18px;margin-bottom:8px;">
 
-      ${radarLabels[i]}：${v}（${getText(v)}）
+      ${radarLabels[i]}：${v}
 
     </div>
 
@@ -483,16 +443,6 @@ function render(){
           <button onclick="adjust(${c.radarIndex},1)">
             ➡
           </button>
-
-        </div>
-
-        <div class="stateGuide">
-
-          <img src="${c.base}_low.png">
-
-          <img src="${c.base}_mid.png">
-
-          <img src="${c.base}_high.png">
 
         </div>
 
