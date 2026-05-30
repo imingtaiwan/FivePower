@@ -346,6 +346,9 @@ function showInsight(i){
 
 let chart;
 
+
+/* 放射線 */
+
 const vectorPlugin = {
 
   id:'vectorLines',
@@ -533,11 +536,30 @@ function draw(){
 
       scales:{
         r:{
+
           min:1,
           max:3,
+
           ticks:{
-            display:false
+            display:false,
+            stepSize:1
+          },
+
+          grid:{
+            circular:false
+          },
+
+          angleLines:{
+            color:"rgba(0,0,0,0.18)",
+            lineWidth:2
+          },
+
+          pointLabels:{
+            font:{
+              size:14
+            }
           }
+
         }
       }
 
