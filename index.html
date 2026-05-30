@@ -113,11 +113,6 @@ body{
   color:#666;
 }
 
-.value{
-  font-size:22px;
-  font-weight:bold;
-}
-
 .control-row{
   display:flex;
   gap:6px;
@@ -265,13 +260,7 @@ const cardData = [
 
 ];
 
-
-/* 1=低 2=中 3=高 */
-
 let state = [2,2,2,2,2];
-
-
-/* 狀態映照 */
 
 const reflections = [
 
@@ -421,12 +410,6 @@ function render(){
 
           </div>
 
-          <div class="value">
-
-            ${state[c.radarIndex]}
-
-          </div>
-
         </div>
 
         <div class="control-row">
@@ -553,7 +536,7 @@ function draw(){
           min:1,
           max:3,
           ticks:{
-            stepSize:1
+            display:false
           }
         }
       }
