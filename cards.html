@@ -18,10 +18,17 @@ body{
   font-family:sans-serif;
 }
 
+.cards{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  gap:20px;
+}
+
 .card{
-  width:300px;
+  width:220px;
   height:auto;
-  margin:40px auto;
+  margin:40px 0;
   perspective:1000px;
   cursor:pointer;
 }
@@ -62,6 +69,11 @@ body{
 
 <h1>五力物件卡</h1>
 
+<div class="cards">
+
+
+<!-- 🔴 守門力 -->
+
 <div class="card" onclick="this.classList.toggle('flipped')">
 
   <div class="card-inner">
@@ -75,8 +87,11 @@ body{
     </div>
 
   </div>
-  
+
 </div>
+
+
+<!-- 🟡 自發力 -->
 
 <div class="card" onclick="this.classList.toggle('flipped')">
 
@@ -94,6 +109,9 @@ body{
 
 </div>
 
+
+<!-- 🟢 調適力 -->
+
 <div class="card" onclick="this.classList.toggle('flipped')">
 
   <div class="card-inner">
@@ -109,7 +127,10 @@ body{
   </div>
 
 </div>
-  
+
+
+<!-- 🔵 照顧力 -->
+
 <div class="card" onclick="this.classList.toggle('flipped')">
 
   <div class="card-inner">
@@ -126,6 +147,9 @@ body{
 
 </div>
 
+
+<!-- 🟣 釐清力 -->
+
 <div class="card" onclick="this.classList.toggle('flipped')">
 
   <div class="card-inner">
@@ -141,7 +165,10 @@ body{
   </div>
 
 </div>
-  
+
+
+</div>
+
 </body>
 
 </html>
